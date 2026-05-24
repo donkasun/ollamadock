@@ -12,6 +12,7 @@ struct MenuBarLabel: View {
     }
 
     static func format(_ bytes: UInt64) -> String {
+        guard bytes > 0 else { return "0 GB" }
         let formatter = ByteCountFormatter()
         formatter.allowedUnits = [.useGB, .useMB]
         formatter.countStyle = .memory
