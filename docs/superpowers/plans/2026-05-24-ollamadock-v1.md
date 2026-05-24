@@ -414,7 +414,7 @@ struct RunningModel: Equatable, Identifiable {
         return min(max(raw, 0), 1)
     }
 
-    func countdownString(now: Date = Date()) -> String {
+    func countdownString(now: Date) -> String {
         let remaining = expiresAt.timeIntervalSince(now)
         if remaining <= 0 { return "unloading…" }
         let total = Int(remaining.rounded(.down))
