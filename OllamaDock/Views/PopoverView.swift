@@ -65,7 +65,6 @@ struct PopoverView: View {
                         ForEach(monitor.models) { model in
                             ModelRow(
                                 model: model,
-                                totalRAM: monitor.totalRAM,
                                 now: monitor.now,
                                 onUnload: { Task { await monitor.unload(model.name) } }
                             )
