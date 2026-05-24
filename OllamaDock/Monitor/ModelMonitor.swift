@@ -28,7 +28,7 @@ final class ModelMonitor {
     init(
         client: OllamaClienting,
         totalRAM: UInt64 = ProcessInfo.processInfo.physicalMemory,
-        pollInterval: TimeInterval = 5,
+        pollInterval: TimeInterval = 10,
         tickInterval: TimeInterval = 1
     ) {
         self.client = client
@@ -52,6 +52,9 @@ final class ModelMonitor {
                 self.now = Date()
                 try? await Task.sleep(nanoseconds: UInt64(self.tickInterval * 1_000_000_000))
             }
+        }
+        Task { [weak self] in
+            await self?.refreshLibrary()
         }
     }
 
