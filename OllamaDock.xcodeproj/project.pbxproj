@@ -14,7 +14,10 @@
 		50C9B8557BA8CA692AE2253C /* ModelMonitorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80710F3ED9A922DFE213BD3 /* ModelMonitorTests.swift */; };
 		659F3F786A5E817D0C4F1D1B /* RunningModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AD5C74835108A6EF03185EB /* RunningModel.swift */; };
 		6C5CA42FDEABD5D6C2AC3126 /* RunningModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2261779D808C2C836517D0F /* RunningModelTests.swift */; };
+		7D30D9EDAFCB0ACA7306D306 /* PopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AC20884E14FF845A3CC0B38 /* PopoverView.swift */; };
+		8DB44FF0F67F8C8EBBB8A615 /* ModelRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FF2544F6FE47EF57A73C751 /* ModelRow.swift */; };
 		91624E61264BC1CBEED45850 /* ps_running.json in Resources */ = {isa = PBXBuildFile; fileRef = 50208EEFF42F1673461C9506 /* ps_running.json */; };
+		9A0B2675018E10528FC1E3F3 /* MenuBarLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63261CF212C7FA71D65B3B3 /* MenuBarLabel.swift */; };
 		BE87303A817ED8F174F8A3F4 /* OllamaDockApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58948E1BACC1841B546D2243 /* OllamaDockApp.swift */; };
 		C115043C571F3D5E57683EC3 /* OllamaClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC8D324FF964EAA2B546B59F /* OllamaClient.swift */; };
 		C298D184052632D0ED19E4B6 /* ps_empty.json in Resources */ = {isa = PBXBuildFile; fileRef = 92094D54940CFE1F86277DD9 /* ps_empty.json */; };
@@ -33,8 +36,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0FF2544F6FE47EF57A73C751 /* ModelRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelRow.swift; sourceTree = "<group>"; };
 		1167D8C7B40F85CB43A0177B /* ConnectionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionState.swift; sourceTree = "<group>"; };
 		2A1FDA4CE348F3007079073E /* MockURLProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockURLProtocol.swift; sourceTree = "<group>"; };
+		3AC20884E14FF845A3CC0B38 /* PopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverView.swift; sourceTree = "<group>"; };
 		46B064A8C7F740D591E34723 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4971D41401FF4306382F6012 /* ps_malformed.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ps_malformed.json; sourceTree = "<group>"; };
 		50208EEFF42F1673461C9506 /* ps_running.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ps_running.json; sourceTree = "<group>"; };
@@ -46,6 +51,7 @@
 		9AD5C74835108A6EF03185EB /* RunningModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningModel.swift; sourceTree = "<group>"; };
 		A80710F3ED9A922DFE213BD3 /* ModelMonitorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelMonitorTests.swift; sourceTree = "<group>"; };
 		C2261779D808C2C836517D0F /* RunningModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningModelTests.swift; sourceTree = "<group>"; };
+		C63261CF212C7FA71D65B3B3 /* MenuBarLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarLabel.swift; sourceTree = "<group>"; };
 		CC8D324FF964EAA2B546B59F /* OllamaClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaClient.swift; sourceTree = "<group>"; };
 		D93B32FA9B098378F7ACCA03 /* OllamaClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaClientTests.swift; sourceTree = "<group>"; };
 		E10C9A914292EBA5B3188BF5 /* PSResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PSResponse.swift; sourceTree = "<group>"; };
@@ -60,6 +66,7 @@
 				4852BEF849914DFAC236AFF1 /* Monitor */,
 				C1571D3820938B1DFCF25DF0 /* Networking */,
 				392B2E3BAA1131A7557E03EB /* Resources */,
+				D6B88521A8AE86123759E74D /* Views */,
 			);
 			path = OllamaDock;
 			sourceTree = "<group>";
@@ -124,6 +131,16 @@
 				538BD3327A0482F4E890FA80 /* OllamaDockTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		D6B88521A8AE86123759E74D /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				C63261CF212C7FA71D65B3B3 /* MenuBarLabel.swift */,
+				0FF2544F6FE47EF57A73C751 /* ModelRow.swift */,
+				3AC20884E14FF845A3CC0B38 /* PopoverView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		FBA8A95EC6AFA863F74AC9A7 /* OllamaDockTests */ = {
@@ -233,10 +250,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				E813890AC19F7DD3C02EEB2A /* ConnectionState.swift in Sources */,
+				9A0B2675018E10528FC1E3F3 /* MenuBarLabel.swift in Sources */,
 				291253792F090DAE6749B5D0 /* ModelMonitor.swift in Sources */,
+				8DB44FF0F67F8C8EBBB8A615 /* ModelRow.swift in Sources */,
 				C115043C571F3D5E57683EC3 /* OllamaClient.swift in Sources */,
 				BE87303A817ED8F174F8A3F4 /* OllamaDockApp.swift in Sources */,
 				4581097FD5DC9E7725FB66A2 /* PSResponse.swift in Sources */,
+				7D30D9EDAFCB0ACA7306D306 /* PopoverView.swift in Sources */,
 				659F3F786A5E817D0C4F1D1B /* RunningModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
