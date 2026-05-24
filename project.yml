@@ -1,0 +1,49 @@
+name: OllamaDock
+options:
+  bundleIdPrefix: dev.ollamadock
+  deploymentTarget:
+    macOS: "13.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MACOSX_DEPLOYMENT_TARGET: "13.0"
+    PRODUCT_NAME: OllamaDock
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    ENABLE_HARDENED_RUNTIME: YES
+    CODE_SIGN_STYLE: Automatic
+    CODE_SIGN_IDENTITY: "-"
+targets:
+  OllamaDock:
+    type: application
+    platform: macOS
+    deploymentTarget: "13.0"
+    sources:
+      - path: OllamaDock
+    info:
+      path: OllamaDock/Resources/Info.plist
+      properties:
+        LSUIElement: true
+        LSMinimumSystemVersion: "13.0"
+        CFBundleDisplayName: OllamaDock
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        NSHumanReadableCopyright: "© 2026 OllamaDock contributors"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.ollamadock.OllamaDock
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: OllamaDock/Resources/Info.plist
+  OllamaDockTests:
+    type: bundle.unit-test
+    platform: macOS
+    deploymentTarget: "13.0"
+    sources:
+      - path: OllamaDockTests
+    dependencies:
+      - target: OllamaDock
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.ollamadock.OllamaDockTests
+        GENERATE_INFOPLIST_FILE: YES
