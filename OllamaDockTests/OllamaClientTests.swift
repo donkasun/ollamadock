@@ -132,6 +132,26 @@ final class OllamaClientTests: XCTestCase {
             XCTFail("unexpected error type: \(error)")
         }
     }
+
+    func test_load_posts_keep_alive_300_no_prompt() async throws {
+        var capturedBody: Data?
+        MockURLProtocol.handler = { req in
+            XCTAssertEqual(req.url?.path, "/api/generate")
+            XCTAssertEqual(req.httpMethod, "POST")
+            XCTAssertEqual(req.value(forHTTPHeaderField: "Content-Type"), "application/json")
+            capturedBody = req.bodyStreamData() ?? req.httpBody
+            return (HTTPURLResponse(url: req.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data())
+        }
+        let client = OllamaClient(session: session())
+        try await client.load(modelName: "gemma4:e2b-mlx")
+
+        let json = try XCTUnwrap(
+            capturedBody.flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] }
+        )
+        XCTAssertEqual(json["model"] as? String, "gemma4:e2b-mlx")
+        XCTAssertEqual(json["keep_alive"] as? Int, 300)
+        XCTAssertNil(json["prompt"], "prompt key must be absent to avoid generating text")
+    }
 }
 
 private extension URLRequest {

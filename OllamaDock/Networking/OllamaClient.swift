@@ -72,6 +72,17 @@ final class OllamaClient: OllamaClienting {
     }
 
     func load(modelName: String) async throws {
-        throw OllamaClientError.transport("not implemented")
+        var request = URLRequest(url: baseURL.appendingPathComponent("api/generate"))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        let body: [String: Any] = ["model": modelName, "keep_alive": 300]
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        let (_, response) = try await session.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
+            throw OllamaClientError.transport("non-HTTP response")
+        }
+        guard (200..<300).contains(http.statusCode) else {
+            throw OllamaClientError.badStatus(http.statusCode)
+        }
     }
 }
