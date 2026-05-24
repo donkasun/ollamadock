@@ -9,10 +9,16 @@ struct ModelRow: View {
 
     var body: some View {
         HStack {
-            Text(model.name)
-                .font(.system(.body, design: .rounded).weight(.medium))
-                .lineLimit(1)
-                .truncationMode(.middle)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(model.name)
+                    .font(.system(.body, design: .rounded).weight(.medium))
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                    .foregroundStyle(.white)
+                Text(MenuBarLabel.format(model.sizeVRAM) + " VRAM")
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.75))
+            }
             Spacer()
             if confirming {
                 HStack(spacing: 6) {
@@ -20,10 +26,12 @@ struct ModelRow: View {
                         confirming = false
                         onUnload()
                     }
-                    .foregroundStyle(.red)
+                    .foregroundStyle(.white)
+                    .fontWeight(.semibold)
                     Button("Cancel") {
                         confirming = false
                     }
+                    .foregroundStyle(.white.opacity(0.75))
                 }
                 .buttonStyle(.borderless)
                 .font(.caption)
@@ -31,18 +39,19 @@ struct ModelRow: View {
                 Text(model.countdownString(now: now))
                     .font(.caption)
                     .monospacedDigit()
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.white.opacity(0.75))
                 Button {
                     confirming = true
                 } label: {
                     Image(systemName: "stop.fill")
+                        .foregroundStyle(.white)
                 }
                 .buttonStyle(.borderless)
                 .help("Stop \(model.name)")
             }
         }
         .padding(10)
-        .background(Color.accentColor.opacity(0.15))
+        .background(Color.accentColor)
         .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 }
