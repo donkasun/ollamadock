@@ -10,6 +10,7 @@ final class ModelMonitor {
     private(set) var now: Date = Date()
     private(set) var lastUnloadError: String?
     private(set) var library: [LibraryModel] = []
+    private(set) var loadingModels: Set<String> = []
 
     let totalRAM: UInt64
 
@@ -70,6 +71,13 @@ final class ModelMonitor {
             totalVRAM = 0
             state = .unreachable
         }
+    }
+
+    func load(_ modelName: String) async {
+        loadingModels.insert(modelName)
+        try? await client.load(modelName: modelName)
+        await refresh()
+        loadingModels.remove(modelName)
     }
 
     func refreshLibrary() async {

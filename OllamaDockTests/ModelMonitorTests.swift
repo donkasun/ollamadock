@@ -171,4 +171,41 @@ final class ModelMonitorTests: XCTestCase {
         // no refreshLibrary call
         XCTAssertTrue(monitor.availableModels.isEmpty)
     }
+
+    func test_load_calls_client_and_refreshes() async {
+        let client = StubClient()
+        client.fetchResult = .success([
+            RunningModel(name: "gemma4:e2b-mlx", sizeVRAM: 1, expiresAt: Date().addingTimeInterval(300))
+        ])
+        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+
+        await monitor.load("gemma4:e2b-mlx")
+
+        XCTAssertEqual(client.loadCalls, ["gemma4:e2b-mlx"])
+        XCTAssertEqual(monitor.models.map(\.name), ["gemma4:e2b-mlx"],
+                       "refresh after load should show model in loaded list")
+    }
+
+    func test_load_clears_loadingModels_after_completion() async {
+        let client = StubClient()
+        client.fetchResult = .success([])
+        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+
+        await monitor.load("qwen3.6:27b-mlx")
+
+        XCTAssertTrue(monitor.loadingModels.isEmpty,
+                      "loadingModels must be empty after load completes")
+    }
+
+    func test_load_failure_still_clears_loadingModels() async {
+        let client = StubClient()
+        client.fetchResult = .success([])
+        client.loadError = URLError(.timedOut)
+        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+
+        await monitor.load("qwen3.6:27b-mlx")
+
+        XCTAssertTrue(monitor.loadingModels.isEmpty,
+                      "loadingModels must be empty even when load() throws")
+    }
 }
