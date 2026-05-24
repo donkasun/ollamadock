@@ -96,6 +96,7 @@ struct PopoverView: View {
                 Image(systemName: "arrow.clockwise")
             }
             .buttonStyle(.bordered)
+            .controlSize(.large)
             .clipShape(Circle())
             .help("Refresh")
             Spacer()
@@ -111,6 +112,7 @@ struct PopoverView: View {
                 Image(systemName: "power")
             }
             .buttonStyle(.bordered)
+            .controlSize(.large)
             .clipShape(Circle())
             .help("Quit")
         }
