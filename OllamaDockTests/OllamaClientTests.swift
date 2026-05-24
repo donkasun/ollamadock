@@ -69,4 +69,52 @@ final class OllamaClientTests: XCTestCase {
             XCTFail("unexpected error type: \(error)")
         }
     }
+
+    func test_unload_posts_keep_alive_zero() async throws {
+        var capturedBody: Data?
+        MockURLProtocol.handler = { req in
+            XCTAssertEqual(req.url?.path, "/api/generate")
+            XCTAssertEqual(req.httpMethod, "POST")
+            XCTAssertEqual(req.value(forHTTPHeaderField: "Content-Type"), "application/json")
+            capturedBody = req.bodyStreamData() ?? req.httpBody
+            return (HTTPURLResponse(url: req.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, Data())
+        }
+        let client = OllamaClient(session: session())
+        try await client.unload(modelName: "qwen3.6:27b-mlx")
+
+        let json = try XCTUnwrap(capturedBody.flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] })
+        XCTAssertEqual(json["model"] as? String, "qwen3.6:27b-mlx")
+        XCTAssertEqual(json["keep_alive"] as? Int, 0)
+    }
+
+    func test_fetchRunning_transport_failure_throws() async {
+        MockURLProtocol.handler = { _ in throw URLError(.cannotConnectToHost) }
+        let client = OllamaClient(session: session())
+        do {
+            _ = try await client.fetchRunning()
+            XCTFail("expected transport error to propagate")
+        } catch is URLError {
+            // expected: URLSession throws the underlying URLError
+        } catch {
+            XCTFail("unexpected error type: \(error)")
+        }
+    }
+}
+
+private extension URLRequest {
+    func bodyStreamData() -> Data? {
+        guard let stream = httpBodyStream else { return nil }
+        stream.open()
+        defer { stream.close() }
+        var data = Data()
+        let bufferSize = 1024
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+        defer { buffer.deallocate() }
+        while stream.hasBytesAvailable {
+            let read = stream.read(buffer, maxLength: bufferSize)
+            if read <= 0 { break }
+            data.append(buffer, count: read)
+        }
+        return data
+    }
 }
