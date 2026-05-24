@@ -39,9 +39,9 @@ This document captures the visual and interaction principles for OllamaDock. We 
 ┌──────────────────────────────────────────┐
 │  header                                  │   "Ollama"  ·  "N loaded · X GB"
 ├──────────────────────────────────────────┤
-│  LOADED ─────────────────────            │   section header (only if non-empty)
+│  RUNNING ─────────────────────           │   section header (only if non-empty)
 │  ┌────────────────────────────┐          │
-│  │ llama3:8b      4m 12s  ◼   │          │   ModelRow
+│  │ llama3:8b      4m 12s  ◼   │          │   ModelRow (solid accent background)
 │  └────────────────────────────┘          │
 │                                          │
 │  AVAILABLE ──────────────────            │   section header (only if non-empty)
@@ -64,13 +64,14 @@ States that replace the two sections entirely: **loading**, **unreachable**, **f
 - Right: `Text("N loaded · X GB")` in `.caption` + `.foregroundStyle(.secondary)`. Secondary color resolves to `NSColor.secondaryLabelColor`, which adapts to light/dark/accessibility contrast modes automatically.
 - The middle-dot separator `·` (U+00B7) is the macOS convention for compound metadata (think Finder's "12 items · 4.2 GB").
 
-### 4. Section headers — "LOADED" / "AVAILABLE"
+### 4. Section headers — "RUNNING" / "AVAILABLE"
 
 Settings-style sectioning:
 
 - Uppercase caption text in `.foregroundStyle(.secondary)` (`.textCase(.uppercase)` so source stays mixed case for localizers).
 - Followed by a 0.5 pt `Rectangle` rule at `Color.secondary.opacity(0.35)` — the same hairline weight used in `Form` and `List` section dividers in macOS 14.
 - Only rendered when their section has at least one row, so the popover doesn't get top-heavy when only one side is populated.
+- The running section label is `"RUNNING"` (not `"LOADED"`) — it reflects live process state, not just presence.
 
 ### 5. ModelRow — the "Loaded" row
 
@@ -82,9 +83,11 @@ The rule for a loaded model is: **you already know its size from the header; you
 └──────────────────────────────────────────┘
 ```
 
-- **Card chrome:** `padding(10)` + `Color.secondary.opacity(0.08)` background + `RoundedRectangle(cornerRadius: 8)`. 8 pt is the modern macOS small-element radius (Sonoma's window controls, sheet inputs, and Settings rows all use 8 or 10 pt).
+- **Card chrome:** `padding(10)` + `Color.accentColor` (full opacity) background + `RoundedRectangle(cornerRadius: 8)`. The solid accent fill makes running models immediately distinct from available ones. 8 pt is the modern macOS small-element radius (Sonoma's window controls, sheet inputs, and Settings rows all use 8 or 10 pt).
+- **Text color:** all text inside the card uses `.white` or `.white.opacity(0.75)` — the solid accent background is always dark enough to ensure legibility regardless of the user's chosen accent colour.
 - **Name:** `.system(.body, design: .rounded).weight(.medium)`. Rounded SF for personality — Ollama model names have colons, decimals, and tags (`qwen3.6:27b-mlx-instruct-q4_K_M`), and rounded weight handles those gracefully. `.lineLimit(1)` + `.truncationMode(.middle)` so long tags truncate as `qwen3.6…q4_K_M` and you still see both ends.
-- **Countdown:** `.caption` + `.monospacedDigit()` + `.foregroundStyle(.secondary)`. Format: `4m 12s`, `42s`, or `unloading…` once the deadline passes. Monospaced digits prevent horizontal jitter as the timer ticks.
+- **VRAM subtitle:** `"\(format(model.sizeVRAM)) VRAM"` in `.caption` + `.white.opacity(0.75)` — tells you how much GPU memory this model is consuming without repeating the header total.
+- **Countdown:** `.caption` + `.monospacedDigit()` + `.white.opacity(0.75)`. Format: `4m 12s`, `42s`, or `unloading…` once the deadline passes. Monospaced digits prevent horizontal jitter as the timer ticks.
 - **Stop button:** `Image(systemName: "stop.fill")`, `.buttonStyle(.borderless)`, `.help("Stop \(model.name)")`. `stop.fill` is the Activity Monitor / QuickTime convention for halting a running process — clearer than `eject` for "kill this model right now."
 
 **Inline destructive confirmation.** Tapping ◼ flips the right side into a two-button confirm strip (`@State var confirming`):
@@ -182,9 +185,10 @@ Dynamic Type works automatically through these styles — if the user bumps font
 
 We use **only** semantic SwiftUI/AppKit colors:
 
-- `Color.secondary` — text, hairline rules (`0.35` opacity), card backgrounds (`0.08` opacity)
+- `Color.secondary` — text, hairline rules (`0.35` opacity), available model card backgrounds (`0.08` opacity)
+- `Color.accentColor` — running model card background (full opacity); resolves to the user's chosen system accent colour
+- `.white` / `.white.opacity(0.75)` — text inside running model cards (over the solid accent background)
 - `.red` (destructive confirm, errors) → `NSColor.systemRed`
-- `.accentColor` → user's chosen system accent (currently used by spinner only)
 
 No hardcoded hex values. No custom asset catalog colors. The popover itself uses `MenuBarExtra(.window)`'s system material, which handles light/dark/vibrancy/wallpaper-tinting automatically.
 
