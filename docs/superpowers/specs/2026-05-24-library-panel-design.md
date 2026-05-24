@@ -14,7 +14,9 @@ Extend the OllamaDock popover to show every downloaded Ollama model, not just th
 
 ## Fetch Strategy
 
-`GET /api/tags` is fetched **once on app start** and again **whenever the user taps Refresh**. It is *not* polled every 5 seconds — the library (which models are on disk) changes rarely (only on `ollama pull` / `ollama rm`), so continuous polling would be wasteful. The 5-second poll loop continues to target only `GET /api/ps` (which models are in VRAM).
+`GET /api/tags` is polled on a **10-minute interval**, plus immediately on app start and whenever the user taps Refresh. The library (which models are on disk) changes rarely (only on `ollama pull` / `ollama rm`), so a slow background cadence is sufficient. The 5-second poll loop continues to target only `GET /api/ps` (which models are in VRAM).
+
+`ModelMonitor` runs a dedicated `libraryTask` loop (alongside the existing `pollTask` and `tickTask`) that sleeps 600 seconds between fetches. The Refresh button triggers an immediate out-of-cycle fetch in addition to waking the next scheduled one.
 
 ---
 
@@ -86,10 +88,13 @@ var availableModels: [LibraryModel] {
 Calls `client.fetchLibrary()`. On success, updates `library`. On failure, leaves `library` unchanged (silently — the library is a best-effort complement to the loaded list; losing it doesn't break core functionality).
 
 **`start()`** (updated)  
-After starting the poll and tick tasks, fires an initial `await refresh()` and `await refreshLibrary()` so the popover is populated immediately on first open.
+Starts a third background task — `libraryTask` — that calls `refreshLibrary()` immediately, then loops with a 600-second (10-minute) sleep between fetches. Same `[weak self]` / `Task.isCancelled` guard pattern as `pollTask` and `tickTask`.
+
+**`stop()`** (updated)  
+Cancels and nils `libraryTask` alongside `pollTask` and `tickTask`.
 
 **`refresh()` in Refresh button** (updated in view, not monitor)  
-The monitor's `refresh()` method is unchanged. The Refresh button now calls both `monitor.refresh()` and `monitor.refreshLibrary()` in sequence.
+The monitor's `refresh()` method is unchanged. The Refresh button now calls both `monitor.refresh()` and `monitor.refreshLibrary()` in sequence — the manual call is an out-of-cycle fetch; it does not reset the 10-minute timer.
 
 **`load(modelName: String) async`** (new)  
 ```
