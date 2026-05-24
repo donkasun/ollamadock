@@ -9,8 +9,14 @@ final class ModelMonitor {
     private(set) var totalVRAM: UInt64 = 0
     private(set) var now: Date = Date()
     private(set) var lastUnloadError: String?
+    private(set) var library: [LibraryModel] = []
 
     let totalRAM: UInt64
+
+    var availableModels: [LibraryModel] {
+        let loadedNames = Set(models.map(\.name))
+        return library.filter { !loadedNames.contains($0.name) }
+    }
 
     private let client: OllamaClienting
     private let pollInterval: TimeInterval
@@ -64,6 +70,11 @@ final class ModelMonitor {
             totalVRAM = 0
             state = .unreachable
         }
+    }
+
+    func refreshLibrary() async {
+        guard let fetched = try? await client.fetchLibrary() else { return }
+        library = fetched
     }
 
     func unload(_ modelName: String) async {

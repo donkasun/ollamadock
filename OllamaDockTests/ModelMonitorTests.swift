@@ -118,4 +118,57 @@ final class ModelMonitorTests: XCTestCase {
 
         XCTAssertNil(monitor.lastUnloadError)
     }
+
+    func test_refreshLibrary_populates_library() async {
+        let client = StubClient()
+        client.libraryResult = .success([
+            LibraryModel(name: "gemma4:e2b-mlx", sizeOnDisk: 7_069_822_916),
+            LibraryModel(name: "qwen3.6:27b-mlx", sizeOnDisk: 19_763_233_079)
+        ])
+        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+
+        await monitor.refreshLibrary()
+
+        XCTAssertEqual(monitor.library.count, 2)
+        XCTAssertEqual(monitor.library[0].name, "gemma4:e2b-mlx")
+        XCTAssertEqual(monitor.library[0].sizeOnDisk, 7_069_822_916)
+    }
+
+    func test_refreshLibrary_failure_leaves_library_unchanged() async {
+        let client = StubClient()
+        client.libraryResult = .success([
+            LibraryModel(name: "gemma4:e2b-mlx", sizeOnDisk: 1)
+        ])
+        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+        await monitor.refreshLibrary()
+        XCTAssertEqual(monitor.library.count, 1)
+
+        client.libraryResult = .failure(URLError(.cannotConnectToHost))
+        await monitor.refreshLibrary()
+
+        XCTAssertEqual(monitor.library.count, 1, "library unchanged on fetch failure")
+    }
+
+    func test_availableModels_excludes_loaded_names() async {
+        let client = StubClient()
+        client.fetchResult = .success([
+            RunningModel(name: "gemma4:e2b-mlx", sizeVRAM: 1, expiresAt: Date().addingTimeInterval(60))
+        ])
+        client.libraryResult = .success([
+            LibraryModel(name: "gemma4:e2b-mlx", sizeOnDisk: 7_069_822_916),
+            LibraryModel(name: "qwen3.6:27b-mlx", sizeOnDisk: 19_763_233_079)
+        ])
+        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+        await monitor.refresh()
+        await monitor.refreshLibrary()
+
+        XCTAssertEqual(monitor.availableModels.map(\.name), ["qwen3.6:27b-mlx"])
+    }
+
+    func test_availableModels_is_empty_when_library_not_loaded() async {
+        let client = StubClient()
+        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+        // no refreshLibrary call
+        XCTAssertTrue(monitor.availableModels.isEmpty)
+    }
 }
