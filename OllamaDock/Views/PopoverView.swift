@@ -35,6 +35,7 @@ struct PopoverView: View {
         case .loading:
             HStack { ProgressView(); Text("Checking…") }
                 .frame(maxWidth: .infinity, minHeight: 80)
+
         case .unreachable:
             VStack(spacing: 6) {
                 Image(systemName: "exclamationmark.triangle")
@@ -46,24 +47,40 @@ struct PopoverView: View {
                     .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity, minHeight: 80)
-        case .connected where monitor.models.isEmpty:
-            VStack(spacing: 4) {
-                Text("No models loaded")
-                    .font(.subheadline)
-                Text("Run a model to see it here.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity, minHeight: 80)
+
         case .connected:
-            VStack(spacing: 6) {
-                ForEach(monitor.models) { model in
-                    ModelRow(
-                        model: model,
-                        totalRAM: monitor.totalRAM,
-                        now: monitor.now,
-                        onUnload: { Task { await monitor.unload(model.name) } }
-                    )
+            if monitor.models.isEmpty && monitor.availableModels.isEmpty {
+                VStack(spacing: 4) {
+                    Text("No models loaded")
+                        .font(.subheadline)
+                    Text("Run a model to see it here.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, minHeight: 80)
+            } else {
+                VStack(spacing: 6) {
+                    if !monitor.models.isEmpty {
+                        SectionHeader("Loaded")
+                        ForEach(monitor.models) { model in
+                            ModelRow(
+                                model: model,
+                                totalRAM: monitor.totalRAM,
+                                now: monitor.now,
+                                onUnload: { Task { await monitor.unload(model.name) } }
+                            )
+                        }
+                    }
+                    if !monitor.availableModels.isEmpty {
+                        SectionHeader("Available")
+                        ForEach(monitor.availableModels) { model in
+                            LibraryRow(
+                                model: model,
+                                isLoading: monitor.loadingModels.contains(model.name),
+                                onLoad: { Task { await monitor.load(model.name) } }
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -72,7 +89,10 @@ struct PopoverView: View {
     private var footer: some View {
         HStack {
             Button("Refresh") {
-                Task { await monitor.refresh() }
+                Task {
+                    await monitor.refresh()
+                    await monitor.refreshLibrary()
+                }
             }
             Button("Unload all") {
                 Task { await monitor.unloadAll() }
@@ -84,5 +104,23 @@ struct PopoverView: View {
             }
         }
         .buttonStyle(.bordered)
+    }
+}
+
+private struct SectionHeader: View {
+    let title: String
+
+    init(_ title: String) { self.title = title }
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
+            Rectangle()
+                .frame(height: 0.5)
+                .foregroundStyle(Color.secondary.opacity(0.35))
+        }
     }
 }
