@@ -20,7 +20,7 @@ Pre-alpha — v1 is being built. See [`docs/superpowers/plans/2026-05-24-ollamad
 
 ## Requirements
 
-- macOS 13 (Ventura) or later
+- macOS 14 (Sonoma) or later
 - Xcode 15 or later
 - [Ollama](https://ollama.com) running locally on `http://localhost:11434`
 

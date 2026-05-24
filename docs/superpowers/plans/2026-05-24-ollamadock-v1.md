@@ -4,9 +4,9 @@
 
 **Goal:** Build a native macOS menubar app that mirrors `ollama ps` in a GUI — shows currently loaded Ollama models, per-model VRAM (as share of system RAM), idle-unload countdown, and one-click unload.
 
-**Architecture:** Single-target SwiftUI app (LSUIElement, no dock icon, macOS 13+). `MenuBarExtra(.window)` hosts a popover. A `ModelMonitor` `@Observable` runs a 5 s polling `Task` against `OllamaClient`, plus a 1 s tick for smooth countdowns. Views are thin and read from the monitor. Networking and decoding are isolated behind an `OllamaClienting` protocol so the monitor is unit-testable with a mock.
+**Architecture:** Single-target SwiftUI app (LSUIElement, no dock icon, macOS 14+). `MenuBarExtra(.window)` hosts a popover. A `ModelMonitor` `@Observable` runs a 5 s polling `Task` against `OllamaClient`, plus a 1 s tick for smooth countdowns. Views are thin and read from the monitor. Networking and decoding are isolated behind an `OllamaClienting` protocol so the monitor is unit-testable with a mock.
 
-**Tech Stack:** Swift 5.9+, SwiftUI, `MenuBarExtra` API (macOS 13+), `URLSession`, XCTest. XcodeGen for reproducible `.xcodeproj` generation. MIT license.
+**Tech Stack:** Swift 5.9+, SwiftUI, `MenuBarExtra` API (macOS 13+), `URLSession`, XCTest. XcodeGen for reproducible `.xcodeproj` generation. MIT license. Deployment target macOS 14 (Sonoma) is required by `@Observable` / `@Bindable`.
 
 ---
 
@@ -31,7 +31,7 @@ OllamaDock/
       ModelRow.swift                       # rich row with VRAM bar + countdown + ⏏
       MenuBarLabel.swift                   # "▦ {totalVRAM}" reactive label
     Resources/
-      Info.plist                           # LSUIElement=YES, LSMinimumSystemVersion=13.0
+      Info.plist                           # LSUIElement=YES, LSMinimumSystemVersion=14.0
   OllamaDockTests/
     Fixtures/
       ps_running.json
@@ -127,7 +127,7 @@ SOFTWARE.
 A native macOS menubar app that shows which Ollama models are currently loaded in GPU memory — the GUI equivalent of `ollama ps`.
 
 ## Requirements
-- macOS 13 (Ventura) or later
+- macOS 14 (Sonoma) or later
 - Xcode 15+
 - [Ollama](https://ollama.com) running locally on port 11434
 
@@ -174,12 +174,12 @@ name: OllamaDock
 options:
   bundleIdPrefix: dev.ollamadock
   deploymentTarget:
-    macOS: "13.0"
+    macOS: "14.0"
   createIntermediateGroups: true
 settings:
   base:
     SWIFT_VERSION: "5.9"
-    MACOSX_DEPLOYMENT_TARGET: "13.0"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
     PRODUCT_NAME: OllamaDock
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"
@@ -190,14 +190,14 @@ targets:
   OllamaDock:
     type: application
     platform: macOS
-    deploymentTarget: "13.0"
+    deploymentTarget: "14.0"
     sources:
       - path: OllamaDock
     info:
       path: OllamaDock/Resources/Info.plist
       properties:
         LSUIElement: true
-        LSMinimumSystemVersion: "13.0"
+        LSMinimumSystemVersion: "14.0"
         CFBundleDisplayName: OllamaDock
         CFBundleShortVersionString: "$(MARKETING_VERSION)"
         CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
@@ -210,7 +210,7 @@ targets:
   OllamaDockTests:
     type: bundle.unit-test
     platform: macOS
-    deploymentTarget: "13.0"
+    deploymentTarget: "14.0"
     sources:
       - path: OllamaDockTests
     dependencies:
@@ -243,7 +243,7 @@ Create `OllamaDock/Resources/Info.plist`:
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>LSMinimumSystemVersion</key>
-    <string>13.0</string>
+    <string>14.0</string>
     <key>LSUIElement</key>
     <true/>
 </dict>
@@ -646,7 +646,7 @@ Edit `project.yml` — in the `OllamaDockTests` target, replace the `sources` bl
   OllamaDockTests:
     type: bundle.unit-test
     platform: macOS
-    deploymentTarget: "13.0"
+    deploymentTarget: "14.0"
     sources:
       - path: OllamaDockTests
         excludes:
@@ -1346,7 +1346,7 @@ A native macOS menubar app that shows which Ollama models are currently loaded i
 - No dock icon (LSUIElement).
 
 ## Requirements
-- macOS 13 (Ventura) or later
+- macOS 14 (Sonoma) or later
 - Xcode 15 or later
 - [Ollama](https://ollama.com) running locally on `http://localhost:11434`
 
