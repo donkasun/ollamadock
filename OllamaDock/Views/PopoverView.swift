@@ -95,11 +95,14 @@ struct PopoverView: View {
             } label: {
                 Image(systemName: "arrow.clockwise")
             }
+            .buttonStyle(.bordered)
+            .clipShape(Circle())
             .help("Refresh")
             Spacer()
             Button("Stop All") {
                 Task { await monitor.unloadAll() }
             }
+            .buttonStyle(.bordered)
             .disabled(monitor.models.isEmpty)
             Spacer()
             Button {
@@ -107,9 +110,10 @@ struct PopoverView: View {
             } label: {
                 Image(systemName: "power")
             }
+            .buttonStyle(.bordered)
+            .clipShape(Circle())
             .help("Quit")
         }
-        .buttonStyle(.bordered)
     }
 }
 
