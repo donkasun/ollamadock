@@ -5,12 +5,12 @@ name: OllamaDock
 options:
   bundleIdPrefix: dev.ollamadock
   deploymentTarget:
-    macOS: "13.0"
+    macOS: "14.0"
   createIntermediateGroups: true
 settings:
   base:
     SWIFT_VERSION: "5.9"
-    MACOSX_DEPLOYMENT_TARGET: "13.0"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
     MARKETING_VERSION: "0.1.0"
     CURRENT_PROJECT_VERSION: "1"
     ENABLE_HARDENED_RUNTIME: YES
@@ -20,14 +20,14 @@ targets:
   OllamaDock:
     type: application
     platform: macOS
-    deploymentTarget: "13.0"
+    deploymentTarget: "14.0"
     sources:
       - path: OllamaDock
     info:
       path: OllamaDock/Resources/Info.plist
       properties:
         LSUIElement: true
-        LSMinimumSystemVersion: "13.0"
+        LSMinimumSystemVersion: "14.0"
         CFBundleDisplayName: OllamaDock
         CFBundleShortVersionString: "$(MARKETING_VERSION)"
         CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
@@ -40,7 +40,7 @@ targets:
   OllamaDockTests:
     type: bundle.unit-test
     platform: macOS
-    deploymentTarget: "13.0"
+    deploymentTarget: "14.0"
     sources:
       - path: OllamaDockTests
         excludes:
