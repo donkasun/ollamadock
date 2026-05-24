@@ -8,6 +8,10 @@ final class ModelMonitorTests: XCTestCase {
         var unloadCalls: [String] = []
         var unloadError: Error?
 
+        var libraryResult: Result<[LibraryModel], Error> = .success([])
+        var loadCalls: [String] = []
+        var loadError: Error?
+
         func fetchRunning() async throws -> [RunningModel] {
             try fetchResult.get()
         }
@@ -15,6 +19,15 @@ final class ModelMonitorTests: XCTestCase {
         func unload(modelName: String) async throws {
             unloadCalls.append(modelName)
             if let unloadError { throw unloadError }
+        }
+
+        func fetchLibrary() async throws -> [LibraryModel] {
+            try libraryResult.get()
+        }
+
+        func load(modelName: String) async throws {
+            loadCalls.append(modelName)
+            if let loadError { throw loadError }
         }
     }
 

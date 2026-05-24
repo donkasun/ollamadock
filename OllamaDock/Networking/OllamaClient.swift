@@ -8,6 +8,8 @@ enum OllamaClientError: Error, Equatable {
 protocol OllamaClienting: Sendable {
     func fetchRunning() async throws -> [RunningModel]
     func unload(modelName: String) async throws
+    func fetchLibrary() async throws -> [LibraryModel]
+    func load(modelName: String) async throws
 }
 
 final class OllamaClient: OllamaClienting {
@@ -53,5 +55,13 @@ final class OllamaClient: OllamaClienting {
         guard (200..<300).contains(http.statusCode) else {
             throw OllamaClientError.badStatus(http.statusCode)
         }
+    }
+
+    func fetchLibrary() async throws -> [LibraryModel] {
+        throw OllamaClientError.transport("not implemented")
+    }
+
+    func load(modelName: String) async throws {
+        throw OllamaClientError.transport("not implemented")
     }
 }
