@@ -1,0 +1,20 @@
+{
+  "models": [
+    {
+      "name": "qwen3.6:27b-mlx",
+      "model": "qwen3.6:27b-mlx",
+      "size": 19000000000,
+      "digest": "60b0437bbd02",
+      "expires_at": "2026-05-24T11:20:00Z",
+      "size_vram": 19000000000
+    },
+    {
+      "name": "llama3:8b",
+      "model": "llama3:8b",
+      "size": 4700000000,
+      "digest": "abc",
+      "expires_at": "2026-05-24T11:25:00Z",
+      "size_vram": 4700000000
+    }
+  ]
+}

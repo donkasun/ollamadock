@@ -43,6 +43,14 @@ targets:
     deploymentTarget: "13.0"
     sources:
       - path: OllamaDockTests
+        excludes:
+          - "Fixtures/**"
+      - path: OllamaDockTests/Fixtures/ps_running.json
+        buildPhase: resources
+      - path: OllamaDockTests/Fixtures/ps_empty.json
+        buildPhase: resources
+      - path: OllamaDockTests/Fixtures/ps_malformed.json
+        buildPhase: resources
     dependencies:
       - target: OllamaDock
     settings:

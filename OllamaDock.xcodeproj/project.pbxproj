@@ -7,10 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2F56A641A2714DAFAD21B01C /* MockURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1FDA4CE348F3007079073E /* MockURLProtocol.swift */; };
+		382A93BDE4E7714EC8384277 /* ps_malformed.json in Resources */ = {isa = PBXBuildFile; fileRef = 4971D41401FF4306382F6012 /* ps_malformed.json */; };
 		4581097FD5DC9E7725FB66A2 /* PSResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10C9A914292EBA5B3188BF5 /* PSResponse.swift */; };
 		659F3F786A5E817D0C4F1D1B /* RunningModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AD5C74835108A6EF03185EB /* RunningModel.swift */; };
 		6C5CA42FDEABD5D6C2AC3126 /* RunningModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2261779D808C2C836517D0F /* RunningModelTests.swift */; };
+		91624E61264BC1CBEED45850 /* ps_running.json in Resources */ = {isa = PBXBuildFile; fileRef = 50208EEFF42F1673461C9506 /* ps_running.json */; };
 		BE87303A817ED8F174F8A3F4 /* OllamaDockApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58948E1BACC1841B546D2243 /* OllamaDockApp.swift */; };
+		C115043C571F3D5E57683EC3 /* OllamaClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC8D324FF964EAA2B546B59F /* OllamaClient.swift */; };
+		C298D184052632D0ED19E4B6 /* ps_empty.json in Resources */ = {isa = PBXBuildFile; fileRef = 92094D54940CFE1F86277DD9 /* ps_empty.json */; };
+		E62037CD22A720961769461A /* OllamaClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93B32FA9B098378F7ACCA03 /* OllamaClientTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -24,12 +30,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2A1FDA4CE348F3007079073E /* MockURLProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockURLProtocol.swift; sourceTree = "<group>"; };
 		46B064A8C7F740D591E34723 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		4971D41401FF4306382F6012 /* ps_malformed.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ps_malformed.json; sourceTree = "<group>"; };
+		50208EEFF42F1673461C9506 /* ps_running.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ps_running.json; sourceTree = "<group>"; };
 		538BD3327A0482F4E890FA80 /* OllamaDockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OllamaDockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		58948E1BACC1841B546D2243 /* OllamaDockApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaDockApp.swift; sourceTree = "<group>"; };
 		713193EA7D258401C371BC01 /* OllamaDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OllamaDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		92094D54940CFE1F86277DD9 /* ps_empty.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ps_empty.json; sourceTree = "<group>"; };
 		9AD5C74835108A6EF03185EB /* RunningModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningModel.swift; sourceTree = "<group>"; };
 		C2261779D808C2C836517D0F /* RunningModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningModelTests.swift; sourceTree = "<group>"; };
+		CC8D324FF964EAA2B546B59F /* OllamaClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaClient.swift; sourceTree = "<group>"; };
+		D93B32FA9B098378F7ACCA03 /* OllamaClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaClientTests.swift; sourceTree = "<group>"; };
 		E10C9A914292EBA5B3188BF5 /* PSResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PSResponse.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -39,6 +51,7 @@
 			children = (
 				58948E1BACC1841B546D2243 /* OllamaDockApp.swift */,
 				AEADD79A15FB182CE5707ADB /* Models */,
+				C1571D3820938B1DFCF25DF0 /* Networking */,
 				392B2E3BAA1131A7557E03EB /* Resources */,
 			);
 			path = OllamaDock;
@@ -50,6 +63,16 @@
 				46B064A8C7F740D591E34723 /* Info.plist */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		3F43E8AB5327C90EE5003317 /* Fixtures */ = {
+			isa = PBXGroup;
+			children = (
+				92094D54940CFE1F86277DD9 /* ps_empty.json */,
+				4971D41401FF4306382F6012 /* ps_malformed.json */,
+				50208EEFF42F1673461C9506 /* ps_running.json */,
+			);
+			path = Fixtures;
 			sourceTree = "<group>";
 		};
 		AEADD79A15FB182CE5707ADB /* Models */ = {
@@ -70,6 +93,14 @@
 			);
 			sourceTree = "<group>";
 		};
+		C1571D3820938B1DFCF25DF0 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				CC8D324FF964EAA2B546B59F /* OllamaClient.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
 		D1846A50198F268953F841AF /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -82,7 +113,10 @@
 		FBA8A95EC6AFA863F74AC9A7 /* OllamaDockTests */ = {
 			isa = PBXGroup;
 			children = (
+				2A1FDA4CE348F3007079073E /* MockURLProtocol.swift */,
+				D93B32FA9B098378F7ACCA03 /* OllamaClientTests.swift */,
 				C2261779D808C2C836517D0F /* RunningModelTests.swift */,
+				3F43E8AB5327C90EE5003317 /* Fixtures */,
 			);
 			path = OllamaDockTests;
 			sourceTree = "<group>";
@@ -112,6 +146,7 @@
 			buildConfigurationList = 9F6E259AEDA6CB1C60F6D2B1 /* Build configuration list for PBXNativeTarget "OllamaDockTests" */;
 			buildPhases = (
 				DF5FE431000F1BAAB1CE10D6 /* Sources */,
+				BF026BA237486A9FFA123DE3 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -162,11 +197,25 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		BF026BA237486A9FFA123DE3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C298D184052632D0ED19E4B6 /* ps_empty.json in Resources */,
+				382A93BDE4E7714EC8384277 /* ps_malformed.json in Resources */,
+				91624E61264BC1CBEED45850 /* ps_running.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		08B63594717D7D0760DD986A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C115043C571F3D5E57683EC3 /* OllamaClient.swift in Sources */,
 				BE87303A817ED8F174F8A3F4 /* OllamaDockApp.swift in Sources */,
 				4581097FD5DC9E7725FB66A2 /* PSResponse.swift in Sources */,
 				659F3F786A5E817D0C4F1D1B /* RunningModel.swift in Sources */,
@@ -177,6 +226,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2F56A641A2714DAFAD21B01C /* MockURLProtocol.swift in Sources */,
+				E62037CD22A720961769461A /* OllamaClientTests.swift in Sources */,
 				6C5CA42FDEABD5D6C2AC3126 /* RunningModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
