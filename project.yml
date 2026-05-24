@@ -54,6 +54,8 @@ targets:
         buildPhase: resources
       - path: OllamaDockTests/Fixtures/ps_malformed.json
         buildPhase: resources
+      - path: OllamaDockTests/Fixtures/tags_two_models.json
+        buildPhase: resources
     dependencies:
       - target: OllamaDock
     settings:
