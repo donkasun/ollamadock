@@ -651,8 +651,14 @@ Edit `project.yml` — in the `OllamaDockTests` target, replace the `sources` bl
       - path: OllamaDockTests
         excludes:
           - "Fixtures/**"
-      - path: OllamaDockTests/Fixtures
-        type: folder
+      # List fixtures individually so they land at the test bundle root.
+      # `type: folder` preserves the Fixtures/ hierarchy, which breaks the
+      # non-recursive Bundle(for:).url(forResource:withExtension:) lookups.
+      - path: OllamaDockTests/Fixtures/ps_running.json
+        buildPhase: resources
+      - path: OllamaDockTests/Fixtures/ps_empty.json
+        buildPhase: resources
+      - path: OllamaDockTests/Fixtures/ps_malformed.json
         buildPhase: resources
     dependencies:
       - target: OllamaDock
