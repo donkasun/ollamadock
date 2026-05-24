@@ -11,6 +11,7 @@
 		2F56A641A2714DAFAD21B01C /* MockURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1FDA4CE348F3007079073E /* MockURLProtocol.swift */; };
 		382A93BDE4E7714EC8384277 /* ps_malformed.json in Resources */ = {isa = PBXBuildFile; fileRef = 4971D41401FF4306382F6012 /* ps_malformed.json */; };
 		4581097FD5DC9E7725FB66A2 /* PSResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10C9A914292EBA5B3188BF5 /* PSResponse.swift */; };
+		4D038318F0880C346A31BC12 /* LibraryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD7FF4F5420015C3E50649C /* LibraryRow.swift */; };
 		50C9B8557BA8CA692AE2253C /* ModelMonitorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80710F3ED9A922DFE213BD3 /* ModelMonitorTests.swift */; };
 		659F3F786A5E817D0C4F1D1B /* RunningModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AD5C74835108A6EF03185EB /* RunningModel.swift */; };
 		6C5CA42FDEABD5D6C2AC3126 /* RunningModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2261779D808C2C836517D0F /* RunningModelTests.swift */; };
@@ -53,6 +54,7 @@
 		9AD5C74835108A6EF03185EB /* RunningModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningModel.swift; sourceTree = "<group>"; };
 		A80710F3ED9A922DFE213BD3 /* ModelMonitorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelMonitorTests.swift; sourceTree = "<group>"; };
 		BA4BD24AD7FD8A320ED2D83A /* tags_two_models.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = tags_two_models.json; sourceTree = "<group>"; };
+		BCD7FF4F5420015C3E50649C /* LibraryRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryRow.swift; sourceTree = "<group>"; };
 		C2261779D808C2C836517D0F /* RunningModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningModelTests.swift; sourceTree = "<group>"; };
 		C63261CF212C7FA71D65B3B3 /* MenuBarLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarLabel.swift; sourceTree = "<group>"; };
 		CC8D324FF964EAA2B546B59F /* OllamaClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaClient.swift; sourceTree = "<group>"; };
@@ -142,6 +144,7 @@
 		D6B88521A8AE86123759E74D /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				BCD7FF4F5420015C3E50649C /* LibraryRow.swift */,
 				C63261CF212C7FA71D65B3B3 /* MenuBarLabel.swift */,
 				0FF2544F6FE47EF57A73C751 /* ModelRow.swift */,
 				3AC20884E14FF845A3CC0B38 /* PopoverView.swift */,
@@ -258,6 +261,7 @@
 			files = (
 				E813890AC19F7DD3C02EEB2A /* ConnectionState.swift in Sources */,
 				9D18F26521DCAF3250BCE645 /* LibraryModel.swift in Sources */,
+				4D038318F0880C346A31BC12 /* LibraryRow.swift in Sources */,
 				9A0B2675018E10528FC1E3F3 /* MenuBarLabel.swift in Sources */,
 				291253792F090DAE6749B5D0 /* ModelMonitor.swift in Sources */,
 				8DB44FF0F67F8C8EBBB8A615 /* ModelRow.swift in Sources */,
