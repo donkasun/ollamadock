@@ -98,6 +98,7 @@ struct PopoverView: View {
             .buttonStyle(.bordered)
             .controlSize(.large)
             .clipShape(Circle())
+            .padding(.leading, -8)
             .help("Refresh")
             Spacer()
             Button("Stop All") {
@@ -114,6 +115,7 @@ struct PopoverView: View {
             .buttonStyle(.bordered)
             .controlSize(.large)
             .clipShape(Circle())
+            .padding(.trailing, -8)
             .help("Quit")
         }
     }
