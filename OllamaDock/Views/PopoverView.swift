@@ -87,20 +87,26 @@ struct PopoverView: View {
 
     private var footer: some View {
         HStack {
-            Button("Refresh") {
+            Button {
                 Task {
                     await monitor.refresh()
                     await monitor.refreshLibrary()
                 }
+            } label: {
+                Image(systemName: "arrow.clockwise")
             }
-            Button("Unload all") {
+            .help("Refresh")
+            Button("Stop All") {
                 Task { await monitor.unloadAll() }
             }
             .disabled(monitor.models.isEmpty)
             Spacer()
-            Button("Quit") {
+            Button {
                 NSApplication.shared.terminate(nil)
+            } label: {
+                Image(systemName: "power")
             }
+            .help("Quit")
         }
         .buttonStyle(.bordered)
     }
