@@ -23,7 +23,7 @@ struct PopoverView: View {
             Text("OllamaDock")
                 .font(.headline)
             Spacer()
-            Text("\(monitor.models.count) loaded · \(MenuBarLabel.format(monitor.totalVRAM))")
+            Text("\(monitor.models.count) running · \(MenuBarLabel.format(monitor.totalVRAM))")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
