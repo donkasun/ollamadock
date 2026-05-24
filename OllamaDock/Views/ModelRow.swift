@@ -42,7 +42,7 @@ struct ModelRow: View {
             }
         }
         .padding(10)
-        .background(Color.secondary.opacity(0.08))
+        .background(Color.accentColor.opacity(0.15))
         .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 }

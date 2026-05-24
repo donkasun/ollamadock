@@ -61,7 +61,7 @@ struct PopoverView: View {
             } else {
                 VStack(spacing: 6) {
                     if !monitor.models.isEmpty {
-                        SectionHeader("Loaded")
+                        SectionHeader("Running")
                         ForEach(monitor.models) { model in
                             ModelRow(
                                 model: model,
@@ -96,6 +96,7 @@ struct PopoverView: View {
                 Image(systemName: "arrow.clockwise")
             }
             .help("Refresh")
+            Spacer()
             Button("Stop All") {
                 Task { await monitor.unloadAll() }
             }
