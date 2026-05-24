@@ -23,6 +23,9 @@ Package.resolved
 .cursor/
 .superpowers/
 
+# AI-generated plans and specs (local only)
+docs/ai/
+
 # Scratch / temp
 test_output.txt
 *.tmp
