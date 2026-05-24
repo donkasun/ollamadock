@@ -95,8 +95,9 @@ struct PopoverView: View {
             } label: {
                 Image(systemName: "arrow.clockwise")
             }
-            .buttonStyle(.borderless)
+            .buttonStyle(.bordered)
             .controlSize(.large)
+            .clipShape(Circle())
             .help("Refresh")
             Spacer()
             Button("Stop All") {
@@ -110,8 +111,9 @@ struct PopoverView: View {
             } label: {
                 Image(systemName: "power")
             }
-            .buttonStyle(.borderless)
+            .buttonStyle(.bordered)
             .controlSize(.large)
+            .clipShape(Circle())
             .help("Quit")
         }
     }
