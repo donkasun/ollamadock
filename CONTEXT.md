@@ -10,19 +10,21 @@ A native macOS menubar app that shows which Ollama models are currently loaded i
 - **Ollamac** is just a chat client, not a monitor
 - No lightweight native Mac app currently mirrors `ollama ps` in a GUI
 
-## What it should do
+## What it does (v1)
 
-- Live menubar icon/popover showing currently loaded models
-- VRAM usage per model
-- Countdown timer until each model unloads (idle timeout)
-- One-click unload button per model
-- Auto-refresh every ~5 seconds
+- Live menubar label showing total VRAM in use (`▦ {VRAM}`, or `▦ Zero KB` when idle)
+- Popover lists each loaded model with name, VRAM bar (share of system RAM), idle-unload countdown
+- One-click unload (⏏) per model, plus "Unload all"
+- Auto-refresh every 5 seconds; 1-second tick for smooth countdowns
+- Four states: loading, connected with models, connected empty, Ollama unreachable
 
 ## Tech stack
 
-- **Swift + SwiftUI** (native macOS)
-- **MenuBarExtra** API (macOS 13+) — makes menubar apps trivial
-- **Ollama REST API** — poll `GET http://localhost:11434/api/ps` for running models
+- **Swift 5.9 + SwiftUI** (native macOS, `MenuBarExtra` + `@Observable` + `@Bindable`)
+- **macOS 14 Sonoma+** (required for `@Observable` and `@Bindable`)
+- **Ollama REST API** — polls `GET http://localhost:11434/api/ps`, unloads via `POST /api/generate` with `keep_alive: 0`
+- **XcodeGen** for reproducible `.xcodeproj` generation
+- **MIT** license
 
 ## Ollama API
 
@@ -47,43 +49,35 @@ Returns JSON:
 }
 ```
 
-## Complexity estimate
+## Architecture
 
-| Feature | Effort |
-|---|---|
-| Menubar icon + popover | ~1 hour |
-| Poll Ollama API + show models | ~1–2 hours |
-| VRAM usage bar | ~1 hour |
-| Unload model button | ~1 hour |
-| Auto-refresh + idle countdown | ~1 hour |
+See [`README.md`](README.md#architecture) for the full tree. Brief summary:
 
-**Total for solid v1: ~1 day**
-
-## Core skeleton
-
-```swift
-@main
-struct OllamaDockApp: App {
-    var body: some Scene {
-        MenuBarExtra("Ollama", systemImage: "cpu") {
-            OllamaStatusView()
-        }
-        .menuBarExtraStyle(.window)
-    }
-}
+```
+OllamaDockApp (@main)
+  └─ MenuBarExtra(label: MenuBarLabel, content: PopoverView)
+       └─ ModelMonitor (@MainActor @Observable)
+             └─ OllamaClient (Sendable, URLSession-backed)
 ```
 
 ## Requirements
 
-- macOS 13+ (Ventura or later)
-- Xcode
+- macOS 14 (Sonoma) or later
+- Xcode 15
 - Ollama running locally on port 11434
 
 ## Status
 
-- [ ] Project scaffolded
-- [ ] Menubar icon + popover
-- [ ] Ollama API integration
-- [ ] Model list UI
-- [ ] VRAM + countdown display
-- [ ] Unload model action
+v1 implementation complete on `feat/v1-scaffold` (20 unit tests passing). Pending: manual GUI verification against a live Ollama daemon.
+
+- [x] Project scaffolded (XcodeGen + Xcode project)
+- [x] Menubar label + popover
+- [x] Ollama API integration (`fetchRunning`, `unload`)
+- [x] Model list UI with VRAM bar + countdown
+- [x] Unload action (per-model + Unload all)
+- [x] Polling + idle countdown
+- [ ] Manual end-to-end verification with live Ollama
+
+## Not in v1
+
+Settings UI · configurable host/port/interval · launch at login · notarized DMG release · per-model history graphs

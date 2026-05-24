@@ -2,12 +2,17 @@ import SwiftUI
 
 @main
 struct OllamaDockApp: App {
-    @State private var monitor = ModelMonitor(client: OllamaClient())
+    @State private var monitor: ModelMonitor
+
+    init() {
+        let monitor = ModelMonitor(client: OllamaClient())
+        monitor.start()
+        _monitor = State(wrappedValue: monitor)
+    }
 
     var body: some Scene {
         MenuBarExtra {
             PopoverView(monitor: monitor)
-                .onAppear { monitor.start() }
         } label: {
             MenuBarLabel(totalVRAM: monitor.totalVRAM)
         }
