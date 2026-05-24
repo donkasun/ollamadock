@@ -987,6 +987,7 @@ final class ModelMonitor {
     private(set) var state: ConnectionState = .loading
     private(set) var totalVRAM: UInt64 = 0
     private(set) var now: Date = Date()
+    private(set) var lastUnloadError: String?
 
     let totalRAM: UInt64
 
@@ -1012,14 +1013,16 @@ final class ModelMonitor {
         guard pollTask == nil else { return }
         pollTask = Task { [weak self] in
             while !Task.isCancelled {
-                await self?.refresh()
-                try? await Task.sleep(nanoseconds: UInt64((self?.pollInterval ?? 5) * 1_000_000_000))
+                guard let self else { return }
+                await self.refresh()
+                try? await Task.sleep(nanoseconds: UInt64(self.pollInterval * 1_000_000_000))
             }
         }
         tickTask = Task { [weak self] in
             while !Task.isCancelled {
-                await MainActor.run { self?.now = Date() }
-                try? await Task.sleep(nanoseconds: UInt64((self?.tickInterval ?? 1) * 1_000_000_000))
+                guard let self else { return }
+                self.now = Date()
+                try? await Task.sleep(nanoseconds: UInt64(self.tickInterval * 1_000_000_000))
             }
         }
     }
@@ -1043,15 +1046,26 @@ final class ModelMonitor {
     }
 
     func unload(_ modelName: String) async {
-        try? await client.unload(modelName: modelName)
+        do {
+            try await client.unload(modelName: modelName)
+            lastUnloadError = nil
+        } catch {
+            lastUnloadError = "Failed to unload \(modelName)"
+        }
         await refresh()
     }
 
     func unloadAll() async {
         let names = models.map(\.name)
+        var failed: [String] = []
         for name in names {
-            try? await client.unload(modelName: name)
+            do {
+                try await client.unload(modelName: name)
+            } catch {
+                failed.append(name)
+            }
         }
+        lastUnloadError = failed.isEmpty ? nil : "Failed to unload \(failed.count) model(s)"
         await refresh()
     }
 }
