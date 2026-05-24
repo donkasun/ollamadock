@@ -45,6 +45,9 @@ targets:
       - path: OllamaDockTests
         excludes:
           - "Fixtures/**"
+      # Fixtures listed individually (not as `type: folder`) so they land at
+      # the test bundle root. `type: folder` preserves the Fixtures/ subdir,
+      # which breaks the non-recursive Bundle(for:).url(forResource:...) lookup.
       - path: OllamaDockTests/Fixtures/ps_running.json
         buildPhase: resources
       - path: OllamaDockTests/Fixtures/ps_empty.json

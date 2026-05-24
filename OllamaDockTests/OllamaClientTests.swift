@@ -8,15 +8,6 @@ final class OllamaClientTests: XCTestCase {
         return URLSession(configuration: config)
     }
 
-    private func fixture(_ name: String) throws -> Data {
-        let url = Bundle(for: Self.self).url(forResource: name, withExtension: "json")!
-        return try Data(contentsOf: url)
-    }
-
-    private func ok(_ data: Data, url: URL) -> HTTPURLResponse {
-        HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!
-    }
-
     func test_fetchRunning_decodes_running_models() async throws {
         MockURLProtocol.handler = { req in
             XCTAssertEqual(req.url?.path, "/api/ps")
