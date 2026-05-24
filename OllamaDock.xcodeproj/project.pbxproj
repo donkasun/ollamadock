@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4581097FD5DC9E7725FB66A2 /* PSResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10C9A914292EBA5B3188BF5 /* PSResponse.swift */; };
+		659F3F786A5E817D0C4F1D1B /* RunningModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AD5C74835108A6EF03185EB /* RunningModel.swift */; };
+		6C5CA42FDEABD5D6C2AC3126 /* RunningModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2261779D808C2C836517D0F /* RunningModelTests.swift */; };
 		BE87303A817ED8F174F8A3F4 /* OllamaDockApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58948E1BACC1841B546D2243 /* OllamaDockApp.swift */; };
 /* End PBXBuildFile section */
 
@@ -25,6 +28,9 @@
 		538BD3327A0482F4E890FA80 /* OllamaDockTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OllamaDockTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		58948E1BACC1841B546D2243 /* OllamaDockApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaDockApp.swift; sourceTree = "<group>"; };
 		713193EA7D258401C371BC01 /* OllamaDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OllamaDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9AD5C74835108A6EF03185EB /* RunningModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningModel.swift; sourceTree = "<group>"; };
+		C2261779D808C2C836517D0F /* RunningModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningModelTests.swift; sourceTree = "<group>"; };
+		E10C9A914292EBA5B3188BF5 /* PSResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PSResponse.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -32,6 +38,7 @@
 			isa = PBXGroup;
 			children = (
 				58948E1BACC1841B546D2243 /* OllamaDockApp.swift */,
+				AEADD79A15FB182CE5707ADB /* Models */,
 				392B2E3BAA1131A7557E03EB /* Resources */,
 			);
 			path = OllamaDock;
@@ -43,6 +50,15 @@
 				46B064A8C7F740D591E34723 /* Info.plist */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		AEADD79A15FB182CE5707ADB /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				E10C9A914292EBA5B3188BF5 /* PSResponse.swift */,
+				9AD5C74835108A6EF03185EB /* RunningModel.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		C0BC27BA9500494600A6268B = {
@@ -66,6 +82,7 @@
 		FBA8A95EC6AFA863F74AC9A7 /* OllamaDockTests */ = {
 			isa = PBXGroup;
 			children = (
+				C2261779D808C2C836517D0F /* RunningModelTests.swift */,
 			);
 			path = OllamaDockTests;
 			sourceTree = "<group>";
@@ -151,6 +168,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				BE87303A817ED8F174F8A3F4 /* OllamaDockApp.swift in Sources */,
+				4581097FD5DC9E7725FB66A2 /* PSResponse.swift in Sources */,
+				659F3F786A5E817D0C4F1D1B /* RunningModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,6 +177,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6C5CA42FDEABD5D6C2AC3126 /* RunningModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -232,7 +252,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = OllamaDock;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -345,7 +365,7 @@
 				MARKETING_VERSION = 0.1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				PRODUCT_NAME = OllamaDock;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
