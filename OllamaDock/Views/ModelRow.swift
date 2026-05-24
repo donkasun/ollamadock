@@ -5,6 +5,8 @@ struct ModelRow: View {
     let now: Date
     let onUnload: () -> Void
 
+    @State private var confirming = false
+
     var body: some View {
         HStack {
             Text(model.name)
@@ -12,15 +14,32 @@ struct ModelRow: View {
                 .lineLimit(1)
                 .truncationMode(.middle)
             Spacer()
-            Text(model.countdownString(now: now))
+            if confirming {
+                HStack(spacing: 6) {
+                    Button("Stop?") {
+                        confirming = false
+                        onUnload()
+                    }
+                    .foregroundStyle(.red)
+                    Button("Cancel") {
+                        confirming = false
+                    }
+                }
+                .buttonStyle(.borderless)
                 .font(.caption)
-                .monospacedDigit()
-                .foregroundStyle(.secondary)
-            Button(action: onUnload) {
-                Image(systemName: "eject.fill")
+            } else {
+                Text(model.countdownString(now: now))
+                    .font(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(.secondary)
+                Button {
+                    confirming = true
+                } label: {
+                    Image(systemName: "stop.fill")
+                }
+                .buttonStyle(.borderless)
+                .help("Stop \(model.name)")
             }
-            .buttonStyle(.borderless)
-            .help("Unload \(model.name)")
         }
         .padding(10)
         .background(Color.secondary.opacity(0.08))
