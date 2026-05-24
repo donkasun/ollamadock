@@ -14,9 +14,17 @@ Extend the OllamaDock popover to show every downloaded Ollama model, not just th
 
 ## Fetch Strategy
 
-`GET /api/tags` is polled on a **10-minute interval**, plus immediately on app start and whenever the user taps Refresh. The library (which models are on disk) changes rarely (only on `ollama pull` / `ollama rm`), so a slow background cadence is sufficient. The 5-second poll loop continues to target only `GET /api/ps` (which models are in VRAM).
+### Polling intervals
 
-`ModelMonitor` runs a dedicated `libraryTask` loop (alongside the existing `pollTask` and `tickTask`) that sleeps 600 seconds between fetches. The Refresh button triggers an immediate out-of-cycle fetch in addition to waking the next scheduled one.
+| Task | Interval | Rationale |
+|---|---|---|
+| `tickTask` | **1 second** | Drives the countdown display — any slower and seconds jump visibly. Non-negotiable. |
+| `pollTask` | **10 seconds** | Models stay loaded for 5 minutes minimum. 10s feels instant to users and halves the wake-ups vs the previous 5s. |
+| `libraryTask` | **On demand only** | `/api/tags` changes only when the user deliberately runs `ollama pull` or `ollama rm`. A background timer adds no value — the Refresh button covers the only case where freshness matters. |
+
+### Library fetch triggers
+
+`GET /api/tags` is called **on app start** and **whenever the user taps Refresh**. There is no background timer for the library. No `libraryTask` loop — `refreshLibrary()` is a plain `async` method called directly at those two points.
 
 ---
 
@@ -88,13 +96,13 @@ var availableModels: [LibraryModel] {
 Calls `client.fetchLibrary()`. On success, updates `library`. On failure, leaves `library` unchanged (silently — the library is a best-effort complement to the loaded list; losing it doesn't break core functionality).
 
 **`start()`** (updated)  
-Starts a third background task — `libraryTask` — that calls `refreshLibrary()` immediately, then loops with a 600-second (10-minute) sleep between fetches. Same `[weak self]` / `Task.isCancelled` guard pattern as `pollTask` and `tickTask`.
+Changes the `pollTask` sleep from 5 seconds to **10 seconds**. Also calls `await refreshLibrary()` once after starting the poll and tick tasks so the library is populated before the first popover open. No new background task — `libraryTask` does not exist.
 
-**`stop()`** (updated)  
-Cancels and nils `libraryTask` alongside `pollTask` and `tickTask`.
+**`stop()`** (unchanged in structure)  
+Still cancels and nils `pollTask` and `tickTask` only.
 
 **`refresh()` in Refresh button** (updated in view, not monitor)  
-The monitor's `refresh()` method is unchanged. The Refresh button now calls both `monitor.refresh()` and `monitor.refreshLibrary()` in sequence — the manual call is an out-of-cycle fetch; it does not reset the 10-minute timer.
+The monitor's `refresh()` method is unchanged. The Refresh button now calls both `monitor.refresh()` and `monitor.refreshLibrary()` in sequence.
 
 **`load(modelName: String) async`** (new)  
 ```
