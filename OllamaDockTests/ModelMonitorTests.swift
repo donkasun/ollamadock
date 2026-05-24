@@ -81,4 +81,28 @@ final class ModelMonitorTests: XCTestCase {
 
         XCTAssertEqual(monitor.totalVRAM, 7)
     }
+
+    func test_unload_failure_sets_lastUnloadError() async {
+        let client = StubClient()
+        client.fetchResult = .success([])
+        client.unloadError = URLError(.timedOut)
+        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+
+        await monitor.unload("qwen3.6:27b-mlx")
+
+        XCTAssertEqual(monitor.lastUnloadError, "Failed to unload qwen3.6:27b-mlx")
+    }
+
+    func test_unload_success_clears_lastUnloadError() async {
+        let client = StubClient()
+        client.fetchResult = .success([])
+        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+        client.unloadError = URLError(.timedOut)
+        await monitor.unload("a")
+        XCTAssertNotNil(monitor.lastUnloadError)
+        client.unloadError = nil
+        await monitor.unload("a")
+
+        XCTAssertNil(monitor.lastUnloadError)
+    }
 }
