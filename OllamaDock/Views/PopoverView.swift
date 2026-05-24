@@ -20,7 +20,7 @@ struct PopoverView: View {
 
     private var header: some View {
         HStack {
-            Text("Ollama")
+            Text("OllamaDock")
                 .font(.headline)
             Spacer()
             Text("\(monitor.models.count) loaded · \(MenuBarLabel.format(monitor.totalVRAM))")
