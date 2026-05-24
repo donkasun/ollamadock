@@ -99,6 +99,39 @@ final class OllamaClientTests: XCTestCase {
             XCTFail("unexpected error type: \(error)")
         }
     }
+
+    func test_fetchLibrary_decodes_tags_response() async throws {
+        MockURLProtocol.handler = { req in
+            XCTAssertEqual(req.url?.path, "/api/tags")
+            XCTAssertEqual(req.httpMethod, "GET")
+            let data = try Data(
+                contentsOf: Bundle(for: OllamaClientTests.self)
+                    .url(forResource: "tags_two_models", withExtension: "json")!
+            )
+            return (HTTPURLResponse(url: req.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, data)
+        }
+        let client = OllamaClient(session: session())
+        let models = try await client.fetchLibrary()
+        XCTAssertEqual(models.count, 2)
+        XCTAssertEqual(models[0].name, "gemma4:e2b-mlx")
+        XCTAssertEqual(models[0].sizeOnDisk, 7_069_822_916)
+        XCTAssertEqual(models[1].name, "qwen3.6:27b-mlx")
+    }
+
+    func test_fetchLibrary_non200_throws_badStatus() async {
+        MockURLProtocol.handler = { req in
+            (HTTPURLResponse(url: req.url!, statusCode: 503, httpVersion: nil, headerFields: nil)!, Data())
+        }
+        let client = OllamaClient(session: session())
+        do {
+            _ = try await client.fetchLibrary()
+            XCTFail("expected error")
+        } catch OllamaClientError.badStatus(let code) {
+            XCTAssertEqual(code, 503)
+        } catch {
+            XCTFail("unexpected error type: \(error)")
+        }
+    }
 }
 
 private extension URLRequest {

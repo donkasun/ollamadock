@@ -58,7 +58,17 @@ final class OllamaClient: OllamaClienting {
     }
 
     func fetchLibrary() async throws -> [LibraryModel] {
-        throw OllamaClientError.transport("not implemented")
+        var request = URLRequest(url: baseURL.appendingPathComponent("api/tags"))
+        request.httpMethod = "GET"
+        let (data, response) = try await session.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
+            throw OllamaClientError.transport("non-HTTP response")
+        }
+        guard (200..<300).contains(http.statusCode) else {
+            throw OllamaClientError.badStatus(http.statusCode)
+        }
+        let tags = try decoder.decode(TagsResponse.self, from: data)
+        return tags.models
     }
 
     func load(modelName: String) async throws {
