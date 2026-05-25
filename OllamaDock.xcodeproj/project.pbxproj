@@ -13,6 +13,7 @@
 		4581097FD5DC9E7725FB66A2 /* PSResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10C9A914292EBA5B3188BF5 /* PSResponse.swift */; };
 		4D038318F0880C346A31BC12 /* LibraryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD7FF4F5420015C3E50649C /* LibraryRow.swift */; };
 		50C9B8557BA8CA692AE2253C /* ModelMonitorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80710F3ED9A922DFE213BD3 /* ModelMonitorTests.swift */; };
+		5CD72178CC19930BEC4B34D1 /* DaemonControlling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0086D26E47F48B1C078000EF /* DaemonControlling.swift */; };
 		62AF06D2A36A38823797C45B /* ByteFormatterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A7BC7EDE37FEF5D1CD325D5 /* ByteFormatterTests.swift */; };
 		659F3F786A5E817D0C4F1D1B /* RunningModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AD5C74835108A6EF03185EB /* RunningModel.swift */; };
 		6C5CA42FDEABD5D6C2AC3126 /* RunningModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2261779D808C2C836517D0F /* RunningModelTests.swift */; };
@@ -41,6 +42,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0086D26E47F48B1C078000EF /* DaemonControlling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaemonControlling.swift; sourceTree = "<group>"; };
 		0FF2544F6FE47EF57A73C751 /* ModelRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelRow.swift; sourceTree = "<group>"; };
 		1167D8C7B40F85CB43A0177B /* ConnectionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionState.swift; sourceTree = "<group>"; };
 		251AF235C1A71D3299C76E5F /* ByteFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ByteFormatter.swift; sourceTree = "<group>"; };
@@ -72,6 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				58948E1BACC1841B546D2243 /* OllamaDockApp.swift */,
+				A3201AF7BF80CD6F050FB17D /* DaemonControl */,
 				AEADD79A15FB182CE5707ADB /* Models */,
 				4852BEF849914DFAC236AFF1 /* Monitor */,
 				C1571D3820938B1DFCF25DF0 /* Networking */,
@@ -115,6 +118,14 @@
 				8E8A8E8E8467AD8094811D16 /* ModelMonitor.swift */,
 			);
 			path = Monitor;
+			sourceTree = "<group>";
+		};
+		A3201AF7BF80CD6F050FB17D /* DaemonControl */ = {
+			isa = PBXGroup;
+			children = (
+				0086D26E47F48B1C078000EF /* DaemonControlling.swift */,
+			);
+			path = DaemonControl;
 			sourceTree = "<group>";
 		};
 		AEADD79A15FB182CE5707ADB /* Models */ = {
@@ -275,6 +286,7 @@
 			files = (
 				F6C6E06EF5941493E9D2F3CC /* ByteFormatter.swift in Sources */,
 				E813890AC19F7DD3C02EEB2A /* ConnectionState.swift in Sources */,
+				5CD72178CC19930BEC4B34D1 /* DaemonControlling.swift in Sources */,
 				9D18F26521DCAF3250BCE645 /* LibraryModel.swift in Sources */,
 				4D038318F0880C346A31BC12 /* LibraryRow.swift in Sources */,
 				9A0B2675018E10528FC1E3F3 /* MenuBarLabel.swift in Sources */,
