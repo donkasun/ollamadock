@@ -2,6 +2,10 @@
 
 A native macOS menubar app that shows which Ollama models are loaded in GPU memory — the GUI equivalent of `ollama ps`.
 
+| Dark | Light |
+|---|---|
+| <img src="assets/popover-dark.png" width="380" alt="OllamaDock popover in dark mode showing a running model card with countdown and an available model"> | <img src="assets/popover-light.png" width="380" alt="OllamaDock popover in light mode showing a running model card with countdown and an available model"> |
+
 ## Why
 
 The official Ollama menubar icon doesn't show which models are loaded. [Ollamac](https://github.com/kevinhermawan/Ollamac) is a chat client, not a monitor. OllamaDock fills that gap: a lightweight, always-visible status widget with one-click load/unload.
