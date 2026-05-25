@@ -1,0 +1,64 @@
+# Source of truth for OllamaDock.xcodeproj and OllamaDock/Resources/Info.plist.
+# Run `xcodegen generate` after editing. The Info.plist on disk is regenerated
+# from `info.properties` below — edit settings here, not in the plist.
+name: OllamaDock
+options:
+  bundleIdPrefix: dev.ollamadock
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    ENABLE_HARDENED_RUNTIME: YES
+    CODE_SIGN_STYLE: Automatic
+    CODE_SIGN_IDENTITY: "-"
+targets:
+  OllamaDock:
+    type: application
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: OllamaDock
+    info:
+      path: OllamaDock/Resources/Info.plist
+      properties:
+        LSUIElement: true
+        LSMinimumSystemVersion: "14.0"
+        CFBundleDisplayName: OllamaDock
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        NSHumanReadableCopyright: "© 2026 OllamaDock contributors"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.ollamadock.OllamaDock
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: OllamaDock/Resources/Info.plist
+  OllamaDockTests:
+    type: bundle.unit-test
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: OllamaDockTests
+        excludes:
+          - "Fixtures/**"
+      # Fixtures listed individually (not as `type: folder`) so they land at
+      # the test bundle root. `type: folder` preserves the Fixtures/ subdir,
+      # which breaks the non-recursive Bundle(for:).url(forResource:...) lookup.
+      - path: OllamaDockTests/Fixtures/ps_running.json
+        buildPhase: resources
+      - path: OllamaDockTests/Fixtures/ps_empty.json
+        buildPhase: resources
+      - path: OllamaDockTests/Fixtures/ps_malformed.json
+        buildPhase: resources
+      - path: OllamaDockTests/Fixtures/tags_two_models.json
+        buildPhase: resources
+    dependencies:
+      - target: OllamaDock
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.ollamadock.OllamaDockTests
+        GENERATE_INFOPLIST_FILE: YES

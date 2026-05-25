@@ -1,7 +1,9 @@
 # macOS
 .DS_Store
+.DS_Store?
+._*
 
-# Xcode
+# Xcode build output
 build/
 DerivedData/
 *.xcuserstate
@@ -9,14 +11,21 @@ xcuserdata/
 *.xcworkspace/xcuserdata/
 *.xcodeproj/xcuserdata/
 *.xcodeproj/project.xcworkspace/xcuserdata/
+*.xcresult
 
-# Swift Package Manager
+# Swift / SPM
 .swiftpm/
 .build/
 Package.resolved
 
-# Brainstorm/working dirs
+# AI / IDE tool state (not project source)
+.claude/
+.cursor/
 .superpowers/
 
-# Cursor IDE local state
-.cursor/
+# AI-generated plans and specs (local only)
+docs/ai/
+
+# Scratch / temp
+test_output.txt
+*.tmp
