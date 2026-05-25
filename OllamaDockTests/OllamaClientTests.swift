@@ -25,6 +25,26 @@ final class OllamaClientTests: XCTestCase {
         XCTAssertEqual(models[0].sizeVRAM, 19_000_000_000)
     }
 
+    func test_fetchRunning_decodes_fractional_seconds_and_offset_dates() async throws {
+        // Real Ollama emits Go time.Time with fractional seconds and a numeric
+        // offset — the default .iso8601 strategy rejects these, which would
+        // wrongly flip the app to "unreachable".
+        let json = """
+        {"models":[{"name":"x","size":1,"size_vram":1,"expires_at":"2026-05-24T14:38:31.837533-07:00"}]}
+        """.data(using: .utf8)!
+        MockURLProtocol.handler = { req in
+            (HTTPURLResponse(url: req.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, json)
+        }
+        let client = OllamaClient(session: session())
+        let models = try await client.fetchRunning()
+        XCTAssertEqual(models.count, 1)
+        let expected = ISO8601DateFormatter().date(from: "2026-05-24T21:38:31Z")!
+        XCTAssertEqual(
+            models[0].expiresAt.timeIntervalSince(expected), 0.837533, accuracy: 0.001,
+            "fractional-seconds + offset date should decode to the correct instant"
+        )
+    }
+
     func test_fetchRunning_empty_models_returns_empty_array() async throws {
         MockURLProtocol.handler = { req in
             let data = try Data(

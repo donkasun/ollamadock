@@ -7,12 +7,6 @@ struct RunningModel: Equatable, Identifiable {
 
     var id: String { name }
 
-    func vramFraction(ofTotalRAM totalRAM: UInt64) -> Double {
-        guard totalRAM > 0 else { return 0 }
-        let raw = Double(sizeVRAM) / Double(totalRAM)
-        return min(max(raw, 0), 1)
-    }
-
     func countdownString(now: Date) -> String {
         let remaining = expiresAt.timeIntervalSince(now)
         if remaining <= 0 { return "unloading…" }

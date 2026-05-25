@@ -7,7 +7,7 @@ struct PopoverView: View {
         VStack(alignment: .leading, spacing: 12) {
             header
             content
-            if let error = monitor.lastUnloadError {
+            if let error = monitor.lastUnloadError ?? monitor.lastLoadError {
                 Text(error)
                     .font(.caption)
                     .foregroundStyle(.red)
@@ -16,6 +16,8 @@ struct PopoverView: View {
         }
         .padding(12)
         .frame(width: 340)
+        .onAppear { monitor.startTicking() }
+        .onDisappear { monitor.stopTicking() }
     }
 
     private var header: some View {

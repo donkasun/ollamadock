@@ -25,26 +25,6 @@ final class RunningModelTests: XCTestCase {
         XCTAssertEqual(response.models[0].sizeVRAM, 19_000_000_000)
     }
 
-    func test_vramFraction_uses_provided_totalRAM() {
-        let model = RunningModel(
-            name: "x",
-            sizeVRAM: 8_000_000_000,
-            expiresAt: Date()
-        )
-        let fraction = model.vramFraction(ofTotalRAM: 32_000_000_000)
-        XCTAssertEqual(fraction, 0.25, accuracy: 0.0001)
-    }
-
-    func test_vramFraction_clamps_to_one() {
-        let model = RunningModel(name: "x", sizeVRAM: 100, expiresAt: Date())
-        XCTAssertEqual(model.vramFraction(ofTotalRAM: 50), 1.0)
-    }
-
-    func test_vramFraction_zero_totalRAM_returns_zero() {
-        let model = RunningModel(name: "x", sizeVRAM: 100, expiresAt: Date())
-        XCTAssertEqual(model.vramFraction(ofTotalRAM: 0), 0.0)
-    }
-
     func test_countdown_in_future_formats_minutes_seconds() {
         let now = Date(timeIntervalSince1970: 1_000_000)
         let model = RunningModel(

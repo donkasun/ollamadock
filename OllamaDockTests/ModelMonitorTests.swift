@@ -36,7 +36,7 @@ final class ModelMonitorTests: XCTestCase {
         client.fetchResult = .success([
             RunningModel(name: "a", sizeVRAM: 1, expiresAt: Date().addingTimeInterval(60))
         ])
-        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+        let monitor = ModelMonitor(client: client)
 
         await monitor.refresh()
 
@@ -48,7 +48,7 @@ final class ModelMonitorTests: XCTestCase {
     func test_refresh_sets_unreachable_on_throw() async {
         let client = StubClient()
         client.fetchResult = .failure(URLError(.cannotConnectToHost))
-        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+        let monitor = ModelMonitor(client: client)
 
         await monitor.refresh()
 
@@ -59,7 +59,7 @@ final class ModelMonitorTests: XCTestCase {
     func test_unload_calls_client_then_refreshes() async {
         let client = StubClient()
         client.fetchResult = .success([])
-        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+        let monitor = ModelMonitor(client: client)
 
         await monitor.unload("qwen3.6:27b-mlx")
 
@@ -74,7 +74,7 @@ final class ModelMonitorTests: XCTestCase {
             RunningModel(name: "b", sizeVRAM: 1, expiresAt: Date())
         ]
         client.fetchResult = .success(models)
-        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+        let monitor = ModelMonitor(client: client)
         await monitor.refresh()
 
         await monitor.unloadAll()
@@ -88,7 +88,7 @@ final class ModelMonitorTests: XCTestCase {
             RunningModel(name: "a", sizeVRAM: 3, expiresAt: Date()),
             RunningModel(name: "b", sizeVRAM: 4, expiresAt: Date())
         ])
-        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+        let monitor = ModelMonitor(client: client)
 
         await monitor.refresh()
 
@@ -99,7 +99,7 @@ final class ModelMonitorTests: XCTestCase {
         let client = StubClient()
         client.fetchResult = .success([])
         client.unloadError = URLError(.timedOut)
-        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+        let monitor = ModelMonitor(client: client)
 
         await monitor.unload("qwen3.6:27b-mlx")
 
@@ -109,7 +109,7 @@ final class ModelMonitorTests: XCTestCase {
     func test_unload_success_clears_lastUnloadError() async {
         let client = StubClient()
         client.fetchResult = .success([])
-        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+        let monitor = ModelMonitor(client: client)
         client.unloadError = URLError(.timedOut)
         await monitor.unload("a")
         XCTAssertNotNil(monitor.lastUnloadError)
@@ -125,7 +125,7 @@ final class ModelMonitorTests: XCTestCase {
             LibraryModel(name: "gemma4:e2b-mlx", sizeOnDisk: 7_069_822_916),
             LibraryModel(name: "qwen3.6:27b-mlx", sizeOnDisk: 19_763_233_079)
         ])
-        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+        let monitor = ModelMonitor(client: client)
 
         await monitor.refreshLibrary()
 
@@ -139,7 +139,7 @@ final class ModelMonitorTests: XCTestCase {
         client.libraryResult = .success([
             LibraryModel(name: "gemma4:e2b-mlx", sizeOnDisk: 1)
         ])
-        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+        let monitor = ModelMonitor(client: client)
         await monitor.refreshLibrary()
         XCTAssertEqual(monitor.library.count, 1)
 
@@ -158,7 +158,7 @@ final class ModelMonitorTests: XCTestCase {
             LibraryModel(name: "gemma4:e2b-mlx", sizeOnDisk: 7_069_822_916),
             LibraryModel(name: "qwen3.6:27b-mlx", sizeOnDisk: 19_763_233_079)
         ])
-        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+        let monitor = ModelMonitor(client: client)
         await monitor.refresh()
         await monitor.refreshLibrary()
 
@@ -167,7 +167,7 @@ final class ModelMonitorTests: XCTestCase {
 
     func test_availableModels_is_empty_when_library_not_loaded() async {
         let client = StubClient()
-        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+        let monitor = ModelMonitor(client: client)
         // no refreshLibrary call
         XCTAssertTrue(monitor.availableModels.isEmpty)
     }
@@ -177,7 +177,7 @@ final class ModelMonitorTests: XCTestCase {
         client.fetchResult = .success([
             RunningModel(name: "gemma4:e2b-mlx", sizeVRAM: 1, expiresAt: Date().addingTimeInterval(300))
         ])
-        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+        let monitor = ModelMonitor(client: client)
 
         await monitor.load("gemma4:e2b-mlx")
 
@@ -189,7 +189,7 @@ final class ModelMonitorTests: XCTestCase {
     func test_load_clears_loadingModels_after_completion() async {
         let client = StubClient()
         client.fetchResult = .success([])
-        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+        let monitor = ModelMonitor(client: client)
 
         await monitor.load("qwen3.6:27b-mlx")
 
@@ -197,11 +197,35 @@ final class ModelMonitorTests: XCTestCase {
                       "loadingModels must be empty after load completes")
     }
 
+    func test_load_failure_sets_lastLoadError() async {
+        let client = StubClient()
+        client.fetchResult = .success([])
+        client.loadError = URLError(.timedOut)
+        let monitor = ModelMonitor(client: client)
+
+        await monitor.load("qwen3.6:27b-mlx")
+
+        XCTAssertEqual(monitor.lastLoadError, "Failed to load qwen3.6:27b-mlx")
+    }
+
+    func test_load_success_clears_lastLoadError() async {
+        let client = StubClient()
+        client.fetchResult = .success([])
+        let monitor = ModelMonitor(client: client)
+        client.loadError = URLError(.timedOut)
+        await monitor.load("a")
+        XCTAssertNotNil(monitor.lastLoadError)
+        client.loadError = nil
+        await monitor.load("a")
+
+        XCTAssertNil(monitor.lastLoadError)
+    }
+
     func test_load_failure_still_clears_loadingModels() async {
         let client = StubClient()
         client.fetchResult = .success([])
         client.loadError = URLError(.timedOut)
-        let monitor = ModelMonitor(client: client, totalRAM: 16_000_000_000)
+        let monitor = ModelMonitor(client: client)
 
         await monitor.load("qwen3.6:27b-mlx")
 
