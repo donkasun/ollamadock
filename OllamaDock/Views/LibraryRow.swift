@@ -12,7 +12,7 @@ struct LibraryRow: View {
                     .font(.system(.body, design: .rounded).weight(.medium))
                     .lineLimit(1)
                     .truncationMode(.middle)
-                Text(MenuBarLabel.format(model.sizeOnDisk) + " on disk")
+                Text(ByteFormatter.format(model.sizeOnDisk) + " on disk")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

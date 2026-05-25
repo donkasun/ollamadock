@@ -15,7 +15,7 @@ struct ModelRow: View {
                     .lineLimit(1)
                     .truncationMode(.middle)
                     .foregroundStyle(.white)
-                Text(MenuBarLabel.format(model.sizeVRAM) + " VRAM")
+                Text(ByteFormatter.format(model.sizeVRAM) + " VRAM")
                     .font(.caption)
                     .foregroundStyle(.white.opacity(0.75))
             }

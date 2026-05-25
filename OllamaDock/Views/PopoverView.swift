@@ -16,7 +16,10 @@ struct PopoverView: View {
         }
         .padding(12)
         .frame(width: 340)
-        .onAppear { monitor.startTicking() }
+        .onAppear {
+            monitor.startTicking()
+            monitor.clearActionErrors()
+        }
         .onDisappear { monitor.stopTicking() }
     }
 
@@ -25,7 +28,7 @@ struct PopoverView: View {
             Text("OllamaDock")
                 .font(.headline)
             Spacer()
-            Text("\(monitor.models.count) running · \(MenuBarLabel.format(monitor.totalVRAM))")
+            Text("\(monitor.models.count) running · \(ByteFormatter.format(monitor.totalVRAM))")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -47,6 +50,19 @@ struct PopoverView: View {
                 Text("Start Ollama, then press Refresh.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, minHeight: 80)
+
+        case .protocolError(let message):
+            VStack(spacing: 6) {
+                Image(systemName: "exclamationmark.triangle")
+                    .font(.title2)
+                Text("Ollama responded unexpectedly")
+                    .font(.subheadline)
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
             }
             .frame(maxWidth: .infinity, minHeight: 80)
 
