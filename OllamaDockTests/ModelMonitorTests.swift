@@ -5,19 +5,23 @@ import XCTest
 final class ModelMonitorTests: XCTestCase {
     final class StubClient: OllamaClienting, @unchecked Sendable {
         var fetchResult: Result<[RunningModel], Error> = .success([])
+        var fetchCount = 0
         var unloadCalls: [String] = []
         var unloadError: Error?
+        var failingUnloads: Set<String> = []
 
         var libraryResult: Result<[LibraryModel], Error> = .success([])
         var loadCalls: [String] = []
         var loadError: Error?
 
         func fetchRunning() async throws -> [RunningModel] {
-            try fetchResult.get()
+            fetchCount += 1
+            return try fetchResult.get()
         }
 
         func unload(modelName: String) async throws {
             unloadCalls.append(modelName)
+            if failingUnloads.contains(modelName) { throw URLError(.timedOut) }
             if let unloadError { throw unloadError }
         }
 
@@ -298,5 +302,81 @@ final class ModelMonitorTests: XCTestCase {
 
         XCTAssertTrue(monitor.loadingModels.isEmpty,
                       "loadingModels must be empty even when load() throws")
+    }
+
+    // MARK: - unloadAll edge cases
+
+    func test_unloadAll_with_no_models_is_noop() async {
+        let client = StubClient()
+        client.fetchResult = .success([])
+        let monitor = ModelMonitor(client: client)
+        await monitor.refresh()
+
+        await monitor.unloadAll()
+
+        XCTAssertTrue(client.unloadCalls.isEmpty, "no models means no unload calls")
+        XCTAssertNil(monitor.lastUnloadError)
+    }
+
+    func test_unloadAll_partial_failure_reports_failed_count() async {
+        let client = StubClient()
+        client.fetchResult = .success([
+            RunningModel(name: "a", sizeVRAM: 1, expiresAt: Date()),
+            RunningModel(name: "b", sizeVRAM: 1, expiresAt: Date()),
+            RunningModel(name: "c", sizeVRAM: 1, expiresAt: Date())
+        ])
+        client.failingUnloads = ["a", "b"]
+        let monitor = ModelMonitor(client: client)
+        await monitor.refresh()
+
+        await monitor.unloadAll()
+
+        XCTAssertEqual(Set(client.unloadCalls), ["a", "b", "c"], "every model is attempted")
+        XCTAssertEqual(monitor.lastUnloadError, "Failed to unload 2 model(s)")
+    }
+
+    // MARK: - lifecycle
+
+    func test_start_polls_and_sets_connected() async throws {
+        let client = StubClient()
+        client.fetchResult = .success([
+            RunningModel(name: "a", sizeVRAM: 1, expiresAt: Date().addingTimeInterval(60))
+        ])
+        let monitor = ModelMonitor(client: client, pollInterval: 0.01, tickInterval: 0.01)
+
+        monitor.start()
+        try await Task.sleep(nanoseconds: 60_000_000)
+        monitor.stop()
+
+        XCTAssertEqual(monitor.state, .connected)
+        XCTAssertEqual(monitor.models.map(\.name), ["a"])
+        XCTAssertGreaterThan(client.fetchCount, 0, "start() should drive at least one poll")
+    }
+
+    func test_stop_halts_polling() async throws {
+        let client = StubClient()
+        client.fetchResult = .success([])
+        let monitor = ModelMonitor(client: client, pollInterval: 0.01, tickInterval: 0.01)
+
+        monitor.start()
+        try await Task.sleep(nanoseconds: 60_000_000)
+        monitor.stop()
+        let countAtStop = client.fetchCount
+        try await Task.sleep(nanoseconds: 60_000_000)
+
+        XCTAssertEqual(client.fetchCount, countAtStop, "no further polls after stop()")
+    }
+
+    func test_startTicking_advances_now() async throws {
+        let client = StubClient()
+        let monitor = ModelMonitor(client: client, pollInterval: 10, tickInterval: 0.01)
+        let before = monitor.now
+        try await Task.sleep(nanoseconds: 20_000_000)
+
+        monitor.startTicking()
+        try await Task.sleep(nanoseconds: 40_000_000)
+        monitor.stopTicking()
+
+        XCTAssertGreaterThan(monitor.now, before, "ticking should move `now` forward")
     }
 }

@@ -13,6 +13,7 @@
 		4581097FD5DC9E7725FB66A2 /* PSResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10C9A914292EBA5B3188BF5 /* PSResponse.swift */; };
 		4D038318F0880C346A31BC12 /* LibraryRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCD7FF4F5420015C3E50649C /* LibraryRow.swift */; };
 		50C9B8557BA8CA692AE2253C /* ModelMonitorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80710F3ED9A922DFE213BD3 /* ModelMonitorTests.swift */; };
+		62AF06D2A36A38823797C45B /* ByteFormatterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A7BC7EDE37FEF5D1CD325D5 /* ByteFormatterTests.swift */; };
 		659F3F786A5E817D0C4F1D1B /* RunningModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AD5C74835108A6EF03185EB /* RunningModel.swift */; };
 		6C5CA42FDEABD5D6C2AC3126 /* RunningModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2261779D808C2C836517D0F /* RunningModelTests.swift */; };
 		7D30D9EDAFCB0ACA7306D306 /* PopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AC20884E14FF845A3CC0B38 /* PopoverView.swift */; };
@@ -26,6 +27,7 @@
 		C5FFFA8562D2901EF9A1F389 /* tags_two_models.json in Resources */ = {isa = PBXBuildFile; fileRef = BA4BD24AD7FD8A320ED2D83A /* tags_two_models.json */; };
 		E62037CD22A720961769461A /* OllamaClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D93B32FA9B098378F7ACCA03 /* OllamaClientTests.swift */; };
 		E813890AC19F7DD3C02EEB2A /* ConnectionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1167D8C7B40F85CB43A0177B /* ConnectionState.swift */; };
+		F6C6E06EF5941493E9D2F3CC /* ByteFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 251AF235C1A71D3299C76E5F /* ByteFormatter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,6 +43,7 @@
 /* Begin PBXFileReference section */
 		0FF2544F6FE47EF57A73C751 /* ModelRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelRow.swift; sourceTree = "<group>"; };
 		1167D8C7B40F85CB43A0177B /* ConnectionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionState.swift; sourceTree = "<group>"; };
+		251AF235C1A71D3299C76E5F /* ByteFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ByteFormatter.swift; sourceTree = "<group>"; };
 		2A1FDA4CE348F3007079073E /* MockURLProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockURLProtocol.swift; sourceTree = "<group>"; };
 		3AC20884E14FF845A3CC0B38 /* PopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverView.swift; sourceTree = "<group>"; };
 		46B064A8C7F740D591E34723 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -51,6 +54,7 @@
 		713193EA7D258401C371BC01 /* OllamaDock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OllamaDock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		8E8A8E8E8467AD8094811D16 /* ModelMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelMonitor.swift; sourceTree = "<group>"; };
 		92094D54940CFE1F86277DD9 /* ps_empty.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ps_empty.json; sourceTree = "<group>"; };
+		9A7BC7EDE37FEF5D1CD325D5 /* ByteFormatterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ByteFormatterTests.swift; sourceTree = "<group>"; };
 		9AD5C74835108A6EF03185EB /* RunningModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningModel.swift; sourceTree = "<group>"; };
 		A80710F3ED9A922DFE213BD3 /* ModelMonitorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelMonitorTests.swift; sourceTree = "<group>"; };
 		BA4BD24AD7FD8A320ED2D83A /* tags_two_models.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = tags_two_models.json; sourceTree = "<group>"; };
@@ -72,9 +76,18 @@
 				4852BEF849914DFAC236AFF1 /* Monitor */,
 				C1571D3820938B1DFCF25DF0 /* Networking */,
 				392B2E3BAA1131A7557E03EB /* Resources */,
+				307BCCB58B24B8C96F5CF114 /* Utilities */,
 				D6B88521A8AE86123759E74D /* Views */,
 			);
 			path = OllamaDock;
+			sourceTree = "<group>";
+		};
+		307BCCB58B24B8C96F5CF114 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				251AF235C1A71D3299C76E5F /* ByteFormatter.swift */,
+			);
+			path = Utilities;
 			sourceTree = "<group>";
 		};
 		392B2E3BAA1131A7557E03EB /* Resources */ = {
@@ -155,6 +168,7 @@
 		FBA8A95EC6AFA863F74AC9A7 /* OllamaDockTests */ = {
 			isa = PBXGroup;
 			children = (
+				9A7BC7EDE37FEF5D1CD325D5 /* ByteFormatterTests.swift */,
 				2A1FDA4CE348F3007079073E /* MockURLProtocol.swift */,
 				A80710F3ED9A922DFE213BD3 /* ModelMonitorTests.swift */,
 				D93B32FA9B098378F7ACCA03 /* OllamaClientTests.swift */,
@@ -259,6 +273,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F6C6E06EF5941493E9D2F3CC /* ByteFormatter.swift in Sources */,
 				E813890AC19F7DD3C02EEB2A /* ConnectionState.swift in Sources */,
 				9D18F26521DCAF3250BCE645 /* LibraryModel.swift in Sources */,
 				4D038318F0880C346A31BC12 /* LibraryRow.swift in Sources */,
@@ -277,6 +292,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				62AF06D2A36A38823797C45B /* ByteFormatterTests.swift in Sources */,
 				2F56A641A2714DAFAD21B01C /* MockURLProtocol.swift in Sources */,
 				50C9B8557BA8CA692AE2253C /* ModelMonitorTests.swift in Sources */,
 				E62037CD22A720961769461A /* OllamaClientTests.swift in Sources */,
