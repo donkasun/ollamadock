@@ -17,11 +17,13 @@
 		62AF06D2A36A38823797C45B /* ByteFormatterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A7BC7EDE37FEF5D1CD325D5 /* ByteFormatterTests.swift */; };
 		659F3F786A5E817D0C4F1D1B /* RunningModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AD5C74835108A6EF03185EB /* RunningModel.swift */; };
 		6C5CA42FDEABD5D6C2AC3126 /* RunningModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2261779D808C2C836517D0F /* RunningModelTests.swift */; };
+		76F77F2005D08BB25D34756E /* ModelMonitorDaemonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AF87CC6A0A5F49D540B79A6 /* ModelMonitorDaemonTests.swift */; };
 		7D30D9EDAFCB0ACA7306D306 /* PopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AC20884E14FF845A3CC0B38 /* PopoverView.swift */; };
 		8DB44FF0F67F8C8EBBB8A615 /* ModelRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FF2544F6FE47EF57A73C751 /* ModelRow.swift */; };
 		91624E61264BC1CBEED45850 /* ps_running.json in Resources */ = {isa = PBXBuildFile; fileRef = 50208EEFF42F1673461C9506 /* ps_running.json */; };
 		9A0B2675018E10528FC1E3F3 /* MenuBarLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C63261CF212C7FA71D65B3B3 /* MenuBarLabel.swift */; };
 		9D18F26521DCAF3250BCE645 /* LibraryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6FB5174BECBCADD53AFB3CF /* LibraryModel.swift */; };
+		AC964D1D10A4226C76900E6D /* DaemonController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 149FBDE7C7BC79A46625C901 /* DaemonController.swift */; };
 		BE87303A817ED8F174F8A3F4 /* OllamaDockApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58948E1BACC1841B546D2243 /* OllamaDockApp.swift */; };
 		C115043C571F3D5E57683EC3 /* OllamaClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC8D324FF964EAA2B546B59F /* OllamaClient.swift */; };
 		C298D184052632D0ED19E4B6 /* ps_empty.json in Resources */ = {isa = PBXBuildFile; fileRef = 92094D54940CFE1F86277DD9 /* ps_empty.json */; };
@@ -45,8 +47,10 @@
 		0086D26E47F48B1C078000EF /* DaemonControlling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaemonControlling.swift; sourceTree = "<group>"; };
 		0FF2544F6FE47EF57A73C751 /* ModelRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelRow.swift; sourceTree = "<group>"; };
 		1167D8C7B40F85CB43A0177B /* ConnectionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionState.swift; sourceTree = "<group>"; };
+		149FBDE7C7BC79A46625C901 /* DaemonController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DaemonController.swift; sourceTree = "<group>"; };
 		251AF235C1A71D3299C76E5F /* ByteFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ByteFormatter.swift; sourceTree = "<group>"; };
 		2A1FDA4CE348F3007079073E /* MockURLProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockURLProtocol.swift; sourceTree = "<group>"; };
+		2AF87CC6A0A5F49D540B79A6 /* ModelMonitorDaemonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelMonitorDaemonTests.swift; sourceTree = "<group>"; };
 		3AC20884E14FF845A3CC0B38 /* PopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverView.swift; sourceTree = "<group>"; };
 		46B064A8C7F740D591E34723 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4971D41401FF4306382F6012 /* ps_malformed.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ps_malformed.json; sourceTree = "<group>"; };
@@ -123,6 +127,7 @@
 		A3201AF7BF80CD6F050FB17D /* DaemonControl */ = {
 			isa = PBXGroup;
 			children = (
+				149FBDE7C7BC79A46625C901 /* DaemonController.swift */,
 				0086D26E47F48B1C078000EF /* DaemonControlling.swift */,
 			);
 			path = DaemonControl;
@@ -181,6 +186,7 @@
 			children = (
 				9A7BC7EDE37FEF5D1CD325D5 /* ByteFormatterTests.swift */,
 				2A1FDA4CE348F3007079073E /* MockURLProtocol.swift */,
+				2AF87CC6A0A5F49D540B79A6 /* ModelMonitorDaemonTests.swift */,
 				A80710F3ED9A922DFE213BD3 /* ModelMonitorTests.swift */,
 				D93B32FA9B098378F7ACCA03 /* OllamaClientTests.swift */,
 				C2261779D808C2C836517D0F /* RunningModelTests.swift */,
@@ -286,6 +292,7 @@
 			files = (
 				F6C6E06EF5941493E9D2F3CC /* ByteFormatter.swift in Sources */,
 				E813890AC19F7DD3C02EEB2A /* ConnectionState.swift in Sources */,
+				AC964D1D10A4226C76900E6D /* DaemonController.swift in Sources */,
 				5CD72178CC19930BEC4B34D1 /* DaemonControlling.swift in Sources */,
 				9D18F26521DCAF3250BCE645 /* LibraryModel.swift in Sources */,
 				4D038318F0880C346A31BC12 /* LibraryRow.swift in Sources */,
@@ -306,6 +313,7 @@
 			files = (
 				62AF06D2A36A38823797C45B /* ByteFormatterTests.swift in Sources */,
 				2F56A641A2714DAFAD21B01C /* MockURLProtocol.swift in Sources */,
+				76F77F2005D08BB25D34756E /* ModelMonitorDaemonTests.swift in Sources */,
 				50C9B8557BA8CA692AE2253C /* ModelMonitorTests.swift in Sources */,
 				E62037CD22A720961769461A /* OllamaClientTests.swift in Sources */,
 				6C5CA42FDEABD5D6C2AC3126 /* RunningModelTests.swift in Sources */,
