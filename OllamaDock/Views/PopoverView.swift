@@ -159,7 +159,7 @@ struct PopoverView: View {
                 showQuitDaemonConfirm = true
             }
             .buttonStyle(.bordered)
-            .disabled(!monitor.daemonUp)
+            .disabled(!monitor.daemonUp || monitor.isDaemonQuitting)
             .help("Quit the Ollama daemon")
 
             Spacer()
