@@ -81,8 +81,28 @@ final class ModelMonitor {
         } catch {
             models = []
             totalVRAM = 0
-            state = .unreachable
+            state = Self.connectionState(for: error)
         }
+    }
+
+    // A reachability failure (daemon down, no socket) means "Ollama isn't
+    // running". A bad status or undecodable body means the daemon answered
+    // but spoke a dialect we don't understand — a different problem.
+    static func connectionState(for error: Error) -> ConnectionState {
+        switch error {
+        case OllamaClientError.badStatus(let code):
+            return .protocolError("Ollama returned HTTP \(code).")
+        case is DecodingError:
+            return .protocolError("Couldn't read Ollama's response — the API may have changed.")
+        default:
+            return .unreachable
+        }
+    }
+
+    // Cleared when the popover reopens so a stale failure doesn't linger.
+    func clearActionErrors() {
+        lastUnloadError = nil
+        lastLoadError = nil
     }
 
     func load(_ modelName: String) async {
@@ -91,7 +111,7 @@ final class ModelMonitor {
             try await client.load(modelName: modelName)
             lastLoadError = nil
         } catch {
-            lastLoadError = "Failed to load \(modelName)"
+            lastLoadError = "Failed to load \(modelName): \(error.localizedDescription)"
         }
         await refresh()
         loadingModels.remove(modelName)
@@ -107,7 +127,7 @@ final class ModelMonitor {
             try await client.unload(modelName: modelName)
             lastUnloadError = nil
         } catch {
-            lastUnloadError = "Failed to unload \(modelName)"
+            lastUnloadError = "Failed to unload \(modelName): \(error.localizedDescription)"
         }
         await refresh()
     }

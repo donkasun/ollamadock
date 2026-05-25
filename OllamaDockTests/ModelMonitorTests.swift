@@ -95,7 +95,7 @@ final class ModelMonitorTests: XCTestCase {
         XCTAssertEqual(monitor.totalVRAM, 7)
     }
 
-    func test_unload_failure_sets_lastUnloadError() async {
+    func test_unload_failure_sets_lastUnloadError() async throws {
         let client = StubClient()
         client.fetchResult = .success([])
         client.unloadError = URLError(.timedOut)
@@ -103,7 +103,11 @@ final class ModelMonitorTests: XCTestCase {
 
         await monitor.unload("qwen3.6:27b-mlx")
 
-        XCTAssertEqual(monitor.lastUnloadError, "Failed to unload qwen3.6:27b-mlx")
+        let message = try XCTUnwrap(monitor.lastUnloadError)
+        XCTAssertTrue(message.hasPrefix("Failed to unload qwen3.6:27b-mlx: "),
+                      "message should name the model")
+        XCTAssertTrue(message.count > "Failed to unload qwen3.6:27b-mlx: ".count,
+                      "message should append the underlying error description")
     }
 
     func test_unload_success_clears_lastUnloadError() async {
@@ -197,7 +201,7 @@ final class ModelMonitorTests: XCTestCase {
                       "loadingModels must be empty after load completes")
     }
 
-    func test_load_failure_sets_lastLoadError() async {
+    func test_load_failure_sets_lastLoadError() async throws {
         let client = StubClient()
         client.fetchResult = .success([])
         client.loadError = URLError(.timedOut)
@@ -205,7 +209,70 @@ final class ModelMonitorTests: XCTestCase {
 
         await monitor.load("qwen3.6:27b-mlx")
 
-        XCTAssertEqual(monitor.lastLoadError, "Failed to load qwen3.6:27b-mlx")
+        let message = try XCTUnwrap(monitor.lastLoadError)
+        XCTAssertTrue(message.hasPrefix("Failed to load qwen3.6:27b-mlx: "),
+                      "message should name the model")
+        XCTAssertTrue(message.count > "Failed to load qwen3.6:27b-mlx: ".count,
+                      "message should append the underlying error description")
+    }
+
+    func test_refresh_badStatus_sets_protocolError() async {
+        let client = StubClient()
+        client.fetchResult = .failure(OllamaClientError.badStatus(500))
+        let monitor = ModelMonitor(client: client)
+
+        await monitor.refresh()
+
+        XCTAssertEqual(monitor.state, .protocolError("Ollama returned HTTP 500."))
+        XCTAssertTrue(monitor.models.isEmpty)
+    }
+
+    func test_refresh_decodingError_sets_protocolError() async {
+        let client = StubClient()
+        let decodingError = DecodingError.dataCorrupted(.init(codingPath: [], debugDescription: "x"))
+        client.fetchResult = .failure(decodingError)
+        let monitor = ModelMonitor(client: client)
+
+        await monitor.refresh()
+
+        if case .protocolError = monitor.state {
+            // expected
+        } else {
+            XCTFail("decoding failure should map to .protocolError, got \(monitor.state)")
+        }
+    }
+
+    func test_refresh_recovers_from_unreachable_to_connected() async {
+        let client = StubClient()
+        client.fetchResult = .failure(URLError(.cannotConnectToHost))
+        let monitor = ModelMonitor(client: client)
+        await monitor.refresh()
+        XCTAssertEqual(monitor.state, .unreachable)
+
+        client.fetchResult = .success([
+            RunningModel(name: "a", sizeVRAM: 5, expiresAt: Date().addingTimeInterval(60))
+        ])
+        await monitor.refresh()
+
+        XCTAssertEqual(monitor.state, .connected)
+        XCTAssertEqual(monitor.models.map(\.name), ["a"])
+    }
+
+    func test_clearActionErrors_clears_both_errors() async {
+        let client = StubClient()
+        client.fetchResult = .success([])
+        client.unloadError = URLError(.timedOut)
+        client.loadError = URLError(.timedOut)
+        let monitor = ModelMonitor(client: client)
+        await monitor.unload("a")
+        await monitor.load("b")
+        XCTAssertNotNil(monitor.lastUnloadError)
+        XCTAssertNotNil(monitor.lastLoadError)
+
+        monitor.clearActionErrors()
+
+        XCTAssertNil(monitor.lastUnloadError)
+        XCTAssertNil(monitor.lastLoadError)
     }
 
     func test_load_success_clears_lastLoadError() async {
