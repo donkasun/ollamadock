@@ -119,6 +119,27 @@ final class ModelMonitorDaemonTests: XCTestCase {
         XCTAssertNotNil(monitor.lastDaemonError)
     }
 
+    func test_startDaemon_resetsIsDaemonStartingAfterCompletion() async {
+        let client = StubClient()
+        let daemon = StubDaemonController()
+        let monitor = ModelMonitor(client: client, daemonController: daemon)
+
+        await monitor.startDaemon()
+
+        XCTAssertFalse(monitor.isDaemonStarting)
+    }
+
+    func test_startDaemon_resetsIsDaemonStartingOnError() async {
+        let client = StubClient()
+        let daemon = StubDaemonController()
+        daemon.startError = DaemonControlError.commandFailed(2)
+        let monitor = ModelMonitor(client: client, daemonController: daemon)
+
+        await monitor.startDaemon()
+
+        XCTAssertFalse(monitor.isDaemonStarting)
+    }
+
     // MARK: - quitDaemon
 
     func test_quitDaemon_success_callsControllerAndRefreshes() async {

@@ -76,6 +76,7 @@ struct PopoverView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.small)
+                    .disabled(monitor.isDaemonStarting)
                 }
             }
             .frame(maxWidth: .infinity, minHeight: 80)

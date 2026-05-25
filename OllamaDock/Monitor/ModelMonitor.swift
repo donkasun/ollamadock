@@ -12,6 +12,7 @@ final class ModelMonitor {
     private(set) var lastLoadError: String?
     private(set) var lastDaemonError: String?
     private(set) var daemonNotInstalled: Bool = false
+    private(set) var isDaemonStarting: Bool = false
     private(set) var library: [LibraryModel] = []
     private(set) var loadingModels: Set<String> = []
 
@@ -124,6 +125,9 @@ final class ModelMonitor {
     }
 
     func startDaemon() async {
+        guard !isDaemonStarting else { return }
+        isDaemonStarting = true
+        defer { isDaemonStarting = false }
         do {
             try await daemonController.start()
             daemonNotInstalled = false
