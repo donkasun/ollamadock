@@ -144,6 +144,22 @@ final class ModelMonitorDaemonTests: XCTestCase {
         XCTAssertNotNil(monitor.lastDaemonError)
     }
 
+    func test_quitDaemon_success_clearsPreexistingError() async {
+        let client = StubClient()
+        let daemon = StubDaemonController()
+        let monitor = ModelMonitor(client: client, daemonController: daemon)
+        // First call fails — seeds lastDaemonError
+        daemon.quitError = DaemonControlError.commandFailed(1)
+        await monitor.quitDaemon()
+        XCTAssertNotNil(monitor.lastDaemonError)   // verify it was set
+
+        // Second call succeeds — should clear the error
+        daemon.quitError = nil
+        await monitor.quitDaemon()
+
+        XCTAssertNil(monitor.lastDaemonError)
+    }
+
     // MARK: - clearActionErrors
 
     func test_clearActionErrors_clearsDaemonFields() async {
