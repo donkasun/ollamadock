@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build Release
+        run: |
+          xcodebuild build \
+            -project OllamaDock.xcodeproj \
+            -scheme OllamaDock \
+            -configuration Release \
+            -destination 'generic/platform=macOS' \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Package app
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          APP="build/Build/Products/Release/OllamaDock.app"
+          test -d "$APP" || { echo "App not found at $APP"; exit 1; }
+          ditto -c -k --sequesterRsrc --keepParent "$APP" "OllamaDock-${TAG}.zip"
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          gh release create "$TAG" \
+            "OllamaDock-${TAG}.zip" \
+            --title "$TAG" \
+            --generate-notes

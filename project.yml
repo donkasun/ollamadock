@@ -37,6 +37,9 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: dev.ollamadock.OllamaDock
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: OllamaDock/Resources/Info.plist
+    scheme:
+      testTargets:
+        - OllamaDockTests
   OllamaDockTests:
     type: bundle.unit-test
     platform: macOS

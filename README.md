@@ -26,6 +26,17 @@ The official Ollama menubar icon doesn't show which models are loaded. [Ollamac]
 - Xcode 15 or later
 - [Ollama](https://ollama.com) running locally on `http://localhost:11434`
 
+## Install
+
+1. Download `OllamaDock-vX.Y.Z.zip` from the [latest release](https://github.com/donkasun/ollamadock/releases/latest).
+2. Unzip and move `OllamaDock.app` to `/Applications`.
+3. Launch it. OllamaDock appears in the menu bar (no Dock icon).
+
+> **First launch:** the app is not notarized, so macOS Gatekeeper will block it
+> with "OllamaDock can't be opened." Right-click the app → **Open** → **Open** to
+> run it once; macOS remembers the choice afterward. (Notarization is planned for
+> a later release.)
+
 ## Build & run
 
 ```bash
