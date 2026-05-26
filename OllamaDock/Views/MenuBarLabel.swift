@@ -5,6 +5,10 @@ struct MenuBarLabel: View {
     let modelRunning: Bool
     let totalVRAM: UInt64
 
+    // Match the menu bar's text line height so the dot image and the VRAM
+    // text share the same box height and the HStack centers them exactly.
+    private var lineHeight: CGFloat { NSFont.menuBarFont(ofSize: 0).boundingRectForFont.height }
+
     var body: some View {
         HStack(spacing: 4) {
             // The menu bar tints any SwiftUI content in its label as a template,
@@ -31,6 +35,8 @@ struct MenuBarLabel: View {
         Circle()
             .fill(modelRunning ? Color(nsColor: .systemGreen) : Color.white)
             .frame(width: 7, height: 7)
-            .padding(2)
+            // Center the dot in a box as tall as the text line, so the two
+            // line up vertically regardless of font metrics or screen scale.
+            .frame(width: 11, height: lineHeight)
     }
 }

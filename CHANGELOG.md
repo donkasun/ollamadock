@@ -6,6 +6,14 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-05-26
+
+### Fixed
+- Menu bar status dot now lines up vertically with the VRAM text (it sat slightly too high before).
+
+### Changed
+- Rewrote the README in plainer, friendlier language and corrected the first-launch (Gatekeeper) instructions for current macOS.
+
 ## [0.2.0] - 2026-05-26
 
 ### Added
@@ -29,6 +37,7 @@ Initial release.
 - Manual refresh plus auto-refresh every 10 seconds with a 1-second countdown tick.
 - No Dock icon (`LSUIElement`).
 
-[Unreleased]: https://github.com/donkasun/ollamadock/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/donkasun/ollamadock/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/donkasun/ollamadock/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/donkasun/ollamadock/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/donkasun/ollamadock/releases/tag/v0.1.0

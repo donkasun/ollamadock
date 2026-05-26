@@ -1,45 +1,53 @@
 # OllamaDock
 
-A native macOS menubar app that shows which Ollama models are loaded in GPU memory — the GUI equivalent of `ollama ps`.
+OllamaDock lives in your Mac's menu bar and shows you, at a glance, which Ollama models are currently loaded in memory — and lets you start, stop, and load them without opening a terminal.
 
 | Dark | Light |
 |---|---|
-| <img src="assets/popover-dark.png" width="380" alt="OllamaDock popover in dark mode showing a running model card with countdown and an available model"> | <img src="assets/popover-light.png" width="380" alt="OllamaDock popover in light mode showing a running model card with countdown and an available model"> |
+| <img src="assets/popover-dark.png" width="380" alt="OllamaDock popover in dark mode showing a running model with a countdown and an available model"> | <img src="assets/popover-light.png" width="380" alt="OllamaDock popover in light mode showing a running model with a countdown and an available model"> |
 
-## Why
+## Why it exists
 
-The official Ollama menubar icon doesn't show which models are loaded. [Ollamac](https://github.com/kevinhermawan/Ollamac) is a chat client, not a monitor. OllamaDock fills that gap: a lightweight, always-visible status widget with one-click load/unload.
+Ollama is great, but once a model is running there's no easy way to see what's using your GPU memory without typing `ollama ps`. The official menu bar icon doesn't tell you, and chat apps like [Ollamac](https://github.com/kevinhermawan/Ollamac) are built for conversations, not monitoring.
 
-## Features
+OllamaDock fills that gap. It's a small, always-there status widget: one glance tells you what's loaded, and one click loads or unloads a model.
 
-- **Menubar label** — a status dot (green when a model is loaded, white when idle) + `{total VRAM}` (e.g. `5.87 GB`), `0 GB` when idle
-- **Status bar** — two labeled dots in the popover: Ollama daemon up/down and model loaded/none
-- **Running models** — each shown as a blue card with name, VRAM used, idle-unload countdown, and a stop button (confirmation expands inside the card)
-- **Available models** — all downloaded-but-unloaded models listed with disk size and a ▶ load button
-- **Start Ollama** — when the daemon is down, launch it from the popover (or a link to ollama.com if it isn't installed)
-- **Stop All** — unloads every running model in one click
-- **Refresh** — re-polls on demand
-- Auto-refresh every 10 seconds; 1-second tick for smooth countdowns
-- No Dock icon (`LSUIElement`)
+## What you can do with it
 
-## Requirements
+- **See what's running** — a green dot in the menu bar means a model is loaded; white means everything's idle. The total GPU memory in use sits right next to it.
+- **Watch the details** — open the popover to see each running model, how much memory it's using, and a countdown to when Ollama will unload it automatically.
+- **Load a model** — every model you've downloaded shows up in an "Available" list. Tap ▶ to load it.
+- **Stop a model** — tap the stop button and confirm. You can also stop everything at once.
+- **Start Ollama** — if Ollama isn't running, OllamaDock can launch it for you. (If it isn't installed yet, you'll get a link to grab it.)
+- **Stay out of the way** — no Dock icon, no clutter. It just sits quietly in the menu bar and refreshes itself every few seconds.
 
-- macOS 14 (Sonoma) or later
-- Xcode 15 or later
-- [Ollama](https://ollama.com) running locally on `http://localhost:11434`
+## What you'll need
 
-## Install
+- A Mac running macOS 14 (Sonoma) or newer
+- [Ollama](https://ollama.com) installed and running
+
+## Installing
 
 1. Download `OllamaDock-vX.Y.Z.zip` from the [latest release](https://github.com/donkasun/ollamadock/releases/latest).
-2. Unzip and move `OllamaDock.app` to `/Applications`.
-3. Launch it. OllamaDock appears in the menu bar (no Dock icon).
+2. Unzip it and drag `OllamaDock.app` into your **Applications** folder.
+3. Open it — you'll see it appear in the menu bar.
 
-> **First launch:** the app is not notarized, so macOS Gatekeeper will block it
-> with "OllamaDock can't be opened." Right-click the app → **Open** → **Open** to
-> run it once; macOS remembers the choice afterward. (Notarization is planned for
-> a later release.)
+> **Heads up on first launch:** OllamaDock isn't notarized by Apple yet, so macOS will block it the first time with a *"Not Opened"* warning. That's expected for a small open-source app — nothing is wrong with it. To open it anyway:
+>
+> 1. Try to open the app once and dismiss the warning (click **Done**, *not* "Move to Bin").
+> 2. Go to **System Settings → Privacy & Security**, scroll down, and click **Open Anyway** next to the OllamaDock message.
+>
+> Prefer the terminal? This one command clears the block:
+>
+> ```bash
+> xattr -dr com.apple.quarantine /Applications/OllamaDock.app
+> ```
+>
+> (Proper notarization is on the roadmap.)
 
-## Build & run
+## Building it yourself
+
+Want to run it from source or tinker with it?
 
 ```bash
 git clone https://github.com/donkasun/ollamadock.git
@@ -47,86 +55,36 @@ cd ollamadock
 open OllamaDock.xcodeproj
 ```
 
-Select the `OllamaDock` scheme and press ⌘R. The app lives in the menu bar with no Dock icon.
+Pick the `OllamaDock` scheme in Xcode and hit ⌘R.
 
-### Regenerating the Xcode project
-
-`OllamaDock.xcodeproj` is generated from [`project.yml`](project.yml) via [XcodeGen](https://github.com/yonaskolb/XcodeGen). Only needed when adding or removing source files:
+The Xcode project is generated from [`project.yml`](project.yml) using [XcodeGen](https://github.com/yonaskolb/XcodeGen), so if you add or remove files you'll need to regenerate it:
 
 ```bash
 brew install xcodegen
 xcodegen generate
 ```
 
-## Tests
+To run the tests:
 
 ```bash
-xcodebuild test \
-  -project OllamaDock.xcodeproj \
-  -scheme OllamaDock \
-  -destination 'platform=macOS'
+xcodebuild test -project OllamaDock.xcodeproj -scheme OllamaDock -destination 'platform=macOS'
 ```
 
-27 unit tests across `RunningModel`, `OllamaClient`, and `ModelMonitor`.
+## How it works (the short version)
 
-## Architecture
+OllamaDock talks to Ollama's local API at `http://localhost:11434`. It checks which models are running every few seconds, lists the ones you've downloaded, and sends a request to load or unload a model when you ask it to. That's really all there is to it — it's a friendly front end for a few Ollama endpoints.
 
-```
-OllamaDockApp           // @main App, owns the ModelMonitor
-  └── MenuBarExtra
-        ├── label:   MenuBarLabel(daemonUp:modelRunning:totalVRAM:)   // status dot + VRAM
-        └── content: PopoverView(monitor:)
-                       ├── header    (count · total VRAM)
-                       ├── statusBar (daemon dot · model dot, with labels)
-                       ├── content (switch on ConnectionState)
-                       │     ├── .loading         → "Checking…"
-                       │     ├── .unreachable      → "Start Ollama" / install link
-                       │     ├── .protocolError    → "Ollama responded unexpectedly"
-                       │     ├── .connected empty  → "No models loaded"
-                       │     └── .connected        → Running + Available sections
-                       ├── error  (red caption on unload failure)
-                       ├── footer (↺ Refresh · Stop All · ⏻ Quit)
-                       └── quitConfirmation (expands when ⏻ armed)
+If you're curious about the design choices behind the UI, see [`docs/DESIGN.md`](docs/DESIGN.md).
 
-ModelMonitor (@MainActor @Observable)
-  ├── Polls OllamaClient every 10 s (running models)
-  ├── Fetches library on start + manual Refresh
-  ├── Ticks `now` every 1 s for smooth countdowns
-  ├── startDaemon() via DaemonController (open -a Ollama)
-  └── Exposes models / availableModels / library / loadingModels / state /
-        totalVRAM / daemonUp / modelRunning
+## Not here yet
 
-OllamaClient (Sendable)
-  ├── GET  /api/ps          → [RunningModel]
-  ├── GET  /api/tags        → [LibraryModel]
-  ├── POST /api/generate    → unload  (keep_alive: 0)
-  └── POST /api/generate    → load    (keep_alive: 300)
+A few things are intentionally left for later releases:
 
-DaemonController (DaemonControlling)
-  └── start()  → `open -a Ollama`  (throws .appNotFound if not installed)
-```
-
-## Ollama API
-
-| Endpoint | Method | Purpose |
-|---|---|---|
-| `/api/ps` | GET | Running models + VRAM usage |
-| `/api/tags` | GET | All downloaded models |
-| `/api/generate` | POST `{"model":"…","keep_alive":0}` | Unload a model |
-| `/api/generate` | POST `{"model":"…","keep_alive":300}` | Load a model |
-
-## Not in v1
-
-- Settings UI
-- Configurable host / port / poll interval
+- A settings screen (custom host, port, or refresh interval)
 - Launch at login
-- Notarized DMG release
-- Per-model history / graphs
+- A notarized, drag-to-install DMG
+- Per-model history or graphs
 
 ## Contributing
 
-Bug reports and pull requests are welcome. Keep PRs scoped to a single concern and include tests for any logic changes.
-
-## License
-
-MIT — see [`LICENSE`](LICENSE).
+Bug reports and pull requests are very welcome! Please keep each PR focused on one thing, and add tests if you're changing behavior.
