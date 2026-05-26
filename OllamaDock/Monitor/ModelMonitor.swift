@@ -13,7 +13,6 @@ final class ModelMonitor {
     private(set) var lastDaemonError: String?
     private(set) var daemonNotInstalled: Bool = false
     private(set) var isDaemonStarting: Bool = false
-    private(set) var isDaemonQuitting: Bool = false
     private(set) var library: [LibraryModel] = []
     private(set) var loadingModels: Set<String> = []
 
@@ -139,19 +138,6 @@ final class ModelMonitor {
         } catch {
             daemonNotInstalled = false
             lastDaemonError = "Failed to start Ollama: \(error.localizedDescription)"
-        }
-        await refresh()
-    }
-
-    func quitDaemon() async {
-        guard !isDaemonQuitting else { return }
-        isDaemonQuitting = true
-        defer { isDaemonQuitting = false }
-        do {
-            try await daemonController.quit()
-            lastDaemonError = nil
-        } catch {
-            lastDaemonError = "Failed to quit Ollama: \(error.localizedDescription)"
         }
         await refresh()
     }

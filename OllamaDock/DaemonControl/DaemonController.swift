@@ -13,16 +13,6 @@ final class DaemonController: DaemonControlling {
         }
     }
 
-    func quit() async throws {
-        let code = try await run(
-            "/usr/bin/osascript",
-            args: ["-e", #"quit app "Ollama""#]
-        )
-        guard code == 0 else {
-            throw DaemonControlError.commandFailed(code)
-        }
-    }
-
     // Runs a command and returns its termination status.
     // Runs off-thread so it doesn't block the main actor.
     private func run(_ executable: String, args: [String]) async throws -> Int32 {

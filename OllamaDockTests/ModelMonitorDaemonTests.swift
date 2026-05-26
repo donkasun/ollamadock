@@ -9,20 +9,15 @@ final class ModelMonitorDaemonTests: XCTestCase {
 
     final class StubDaemonController: DaemonControlling, @unchecked Sendable {
         var startCalls = 0
-        var quitCalls = 0
         var startError: Error?
-        var quitError: Error?
 
         func start() async throws {
             startCalls += 1
             if let e = startError { throw e }
         }
-
-        func quit() async throws {
-            quitCalls += 1
-            if let e = quitError { throw e }
-        }
     }
+
+    struct StubError: Error {}
 
     final class StubClient: OllamaClienting, @unchecked Sendable {
         var fetchResult: Result<[RunningModel], Error> = .success([])
@@ -110,7 +105,7 @@ final class ModelMonitorDaemonTests: XCTestCase {
     func test_startDaemon_otherError_setsLastDaemonError() async {
         let client = StubClient()
         let daemon = StubDaemonController()
-        daemon.startError = DaemonControlError.commandFailed(2)
+        daemon.startError = StubError()
         let monitor = ModelMonitor(client: client, daemonController: daemon)
 
         await monitor.startDaemon()
@@ -132,7 +127,7 @@ final class ModelMonitorDaemonTests: XCTestCase {
     func test_startDaemon_resetsIsDaemonStartingOnError() async {
         let client = StubClient()
         let daemon = StubDaemonController()
-        daemon.startError = DaemonControlError.commandFailed(2)
+        daemon.startError = StubError()
         let monitor = ModelMonitor(client: client, daemonController: daemon)
 
         await monitor.startDaemon()
@@ -140,74 +135,12 @@ final class ModelMonitorDaemonTests: XCTestCase {
         XCTAssertFalse(monitor.isDaemonStarting)
     }
 
-    // MARK: - quitDaemon
-
-    func test_quitDaemon_success_callsControllerAndRefreshes() async {
-        let client = StubClient()
-        let daemon = StubDaemonController()
-        let monitor = ModelMonitor(client: client, daemonController: daemon)
-
-        await monitor.quitDaemon()
-
-        XCTAssertEqual(daemon.quitCalls, 1)
-        XCTAssertEqual(client.fetchCount, 1)
-        XCTAssertNil(monitor.lastDaemonError)
-    }
-
-    func test_quitDaemon_failure_setsLastDaemonError() async {
-        let client = StubClient()
-        let daemon = StubDaemonController()
-        daemon.quitError = DaemonControlError.commandFailed(1)
-        let monitor = ModelMonitor(client: client, daemonController: daemon)
-
-        await monitor.quitDaemon()
-
-        XCTAssertNotNil(monitor.lastDaemonError)
-    }
-
-    func test_quitDaemon_success_clearsPreexistingError() async {
-        let client = StubClient()
-        let daemon = StubDaemonController()
-        let monitor = ModelMonitor(client: client, daemonController: daemon)
-        // First call fails — seeds lastDaemonError
-        daemon.quitError = DaemonControlError.commandFailed(1)
-        await monitor.quitDaemon()
-        XCTAssertNotNil(monitor.lastDaemonError)   // verify it was set
-
-        // Second call succeeds — should clear the error
-        daemon.quitError = nil
-        await monitor.quitDaemon()
-
-        XCTAssertNil(monitor.lastDaemonError)
-    }
-
-    func test_quitDaemon_resetsIsDaemonQuittingAfterCompletion() async {
-        let client = StubClient()
-        let daemon = StubDaemonController()
-        let monitor = ModelMonitor(client: client, daemonController: daemon)
-
-        await monitor.quitDaemon()
-
-        XCTAssertFalse(monitor.isDaemonQuitting)
-    }
-
-    func test_quitDaemon_resetsIsDaemonQuittingOnError() async {
-        let client = StubClient()
-        let daemon = StubDaemonController()
-        daemon.quitError = DaemonControlError.commandFailed(1)
-        let monitor = ModelMonitor(client: client, daemonController: daemon)
-
-        await monitor.quitDaemon()
-
-        XCTAssertFalse(monitor.isDaemonQuitting)
-    }
-
     // MARK: - clearActionErrors
 
     func test_clearActionErrors_clearsDaemonFields() async {
         let client = StubClient()
         let daemon = StubDaemonController()
-        daemon.startError = DaemonControlError.commandFailed(2)
+        daemon.startError = StubError()
         let monitor = ModelMonitor(client: client, daemonController: daemon)
         await monitor.startDaemon()          // sets lastDaemonError
 

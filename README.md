@@ -12,9 +12,11 @@ The official Ollama menubar icon doesn't show which models are loaded. [Ollamac]
 
 ## Features
 
-- **Menubar label** — `⊡ {total VRAM}` (e.g. `5.87 GB`), `0 GB` when idle
-- **Running models** — each shown as a blue card with name, VRAM used, idle-unload countdown, and a stop button (with confirmation)
+- **Menubar label** — a status dot (green when a model is loaded, white when idle) + `{total VRAM}` (e.g. `5.87 GB`), `0 GB` when idle
+- **Status bar** — two labeled dots in the popover: Ollama daemon up/down and model loaded/none
+- **Running models** — each shown as a blue card with name, VRAM used, idle-unload countdown, and a stop button (confirmation expands inside the card)
 - **Available models** — all downloaded-but-unloaded models listed with disk size and a ▶ load button
+- **Start Ollama** — when the daemon is down, launch it from the popover (or a link to ollama.com if it isn't installed)
 - **Stop All** — unloads every running model in one click
 - **Refresh** — re-polls on demand
 - Auto-refresh every 10 seconds; 1-second tick for smooth countdowns
@@ -72,28 +74,36 @@ xcodebuild test \
 ```
 OllamaDockApp           // @main App, owns the ModelMonitor
   └── MenuBarExtra
-        ├── label:   MenuBarLabel(totalVRAM:)
+        ├── label:   MenuBarLabel(daemonUp:modelRunning:totalVRAM:)   // status dot + VRAM
         └── content: PopoverView(monitor:)
-                       ├── header  (count · total VRAM)
+                       ├── header    (count · total VRAM)
+                       ├── statusBar (daemon dot · model dot, with labels)
                        ├── content (switch on ConnectionState)
                        │     ├── .loading         → "Checking…"
-                       │     ├── .unreachable      → "Ollama isn't running"
+                       │     ├── .unreachable      → "Start Ollama" / install link
+                       │     ├── .protocolError    → "Ollama responded unexpectedly"
                        │     ├── .connected empty  → "No models loaded"
                        │     └── .connected        → Running + Available sections
                        ├── error  (red caption on unload failure)
-                       └── footer (↺ Refresh · Stop All · ⏻ Quit)
+                       ├── footer (↺ Refresh · Stop All · ⏻ Quit)
+                       └── quitConfirmation (expands when ⏻ armed)
 
 ModelMonitor (@MainActor @Observable)
   ├── Polls OllamaClient every 10 s (running models)
   ├── Fetches library on start + manual Refresh
   ├── Ticks `now` every 1 s for smooth countdowns
-  └── Exposes models / availableModels / library / loadingModels / state / totalVRAM
+  ├── startDaemon() via DaemonController (open -a Ollama)
+  └── Exposes models / availableModels / library / loadingModels / state /
+        totalVRAM / daemonUp / modelRunning
 
 OllamaClient (Sendable)
   ├── GET  /api/ps          → [RunningModel]
   ├── GET  /api/tags        → [LibraryModel]
   ├── POST /api/generate    → unload  (keep_alive: 0)
   └── POST /api/generate    → load    (keep_alive: 300)
+
+DaemonController (DaemonControlling)
+  └── start()  → `open -a Ollama`  (throws .appNotFound if not installed)
 ```
 
 ## Ollama API

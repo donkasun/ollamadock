@@ -2,11 +2,12 @@ import SwiftUI
 
 struct PopoverView: View {
     @Bindable var monitor: ModelMonitor
-    @State private var showQuitDaemonConfirm = false
+    @State private var showQuitConfirm = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             header
+            statusBar
             content
             if let error = monitor.lastUnloadError
                             ?? monitor.lastLoadError
@@ -16,6 +17,9 @@ struct PopoverView: View {
                     .foregroundStyle(.red)
             }
             footer
+            if showQuitConfirm {
+                quitConfirmation
+            }
         }
         .padding(12)
         .frame(width: 340)
@@ -24,18 +28,26 @@ struct PopoverView: View {
             monitor.clearActionErrors()
         }
         .onDisappear { monitor.stopTicking() }
-        .confirmationDialog(
-            "Quit the Ollama daemon?",
-            isPresented: $showQuitDaemonConfirm,
-            titleVisibility: .visible
-        ) {
-            Button("Quit Ollama", role: .destructive) {
-                Task { await monitor.quitDaemon() }
+    }
+
+    private var quitConfirmation: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Divider()
+            HStack {
+                Text("Quit OllamaDock?")
+                    .font(.subheadline.weight(.semibold))
+                Spacer()
+                Button("Cancel") {
+                    withAnimation(.easeInOut(duration: 0.15)) { showQuitConfirm = false }
+                }
+                .buttonStyle(.bordered)
+                Button("Quit") {
+                    NSApplication.shared.terminate(nil)
+                }
+                .buttonStyle(.borderedProminent)
             }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("Running models will be unloaded.")
         }
+        .transition(.move(edge: .top).combined(with: .opacity))
     }
 
     private var header: some View {
@@ -46,6 +58,20 @@ struct PopoverView: View {
             Text("\(monitor.models.count) running · \(ByteFormatter.format(monitor.totalVRAM))")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+        }
+    }
+
+    private var statusBar: some View {
+        HStack(spacing: 16) {
+            StatusIndicator(
+                active: monitor.daemonUp,
+                label: monitor.daemonUp ? "Ollama running" : "Ollama stopped"
+            )
+            StatusIndicator(
+                active: monitor.modelRunning,
+                label: monitor.modelRunning ? "Model loaded" : "No model loaded"
+            )
+            Spacer()
         }
     }
 
@@ -155,17 +181,10 @@ struct PopoverView: View {
             .buttonStyle(.bordered)
             .disabled(monitor.models.isEmpty)
 
-            Button("Quit Ollama") {
-                showQuitDaemonConfirm = true
-            }
-            .buttonStyle(.bordered)
-            .disabled(!monitor.daemonUp || monitor.isDaemonQuitting)
-            .help("Quit the Ollama daemon")
-
             Spacer()
 
             Button {
-                NSApplication.shared.terminate(nil)
+                withAnimation(.easeInOut(duration: 0.15)) { showQuitConfirm = true }
             } label: {
                 Image(systemName: "power")
             }
@@ -174,6 +193,22 @@ struct PopoverView: View {
             .clipShape(Circle())
             .padding(.trailing, -8)
             .help("Quit OllamaDock")
+        }
+    }
+}
+
+private struct StatusIndicator: View {
+    let active: Bool
+    let label: String
+
+    var body: some View {
+        HStack(spacing: 5) {
+            Circle()
+                .fill(active ? Color(nsColor: .systemGreen) : Color(nsColor: .systemGray))
+                .frame(width: 7, height: 7)
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
     }
 }

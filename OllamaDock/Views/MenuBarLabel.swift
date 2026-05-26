@@ -7,19 +7,30 @@ struct MenuBarLabel: View {
 
     var body: some View {
         HStack(spacing: 4) {
-            // Top dot = model loaded; bottom dot = daemon up.
-            VStack(spacing: 2) {
-                Circle()
-                    .fill(modelRunning ? Color.green : Color.secondary)
-                    .frame(width: 6, height: 6)
-                Circle()
-                    .fill(daemonUp ? Color.green : Color.secondary)
-                    .frame(width: 6, height: 6)
-            }
+            // The menu bar tints any SwiftUI content in its label as a template,
+            // which strips our colors. Rendering the dot to a non-template
+            // NSImage is the only reliable way to keep the green/white fill.
+            Image(nsImage: dotImage)
             if daemonUp {
                 Text(ByteFormatter.format(totalVRAM))
                     .monospacedDigit()
             }
         }
+    }
+
+    // Single dot = model status. Green = a model is loaded, white = none.
+    private var dotImage: NSImage {
+        let renderer = ImageRenderer(content: dot)
+        renderer.scale = NSScreen.main?.backingScaleFactor ?? 2
+        let image = renderer.nsImage ?? NSImage()
+        image.isTemplate = false
+        return image
+    }
+
+    private var dot: some View {
+        Circle()
+            .fill(modelRunning ? Color(nsColor: .systemGreen) : Color.white)
+            .frame(width: 7, height: 7)
+            .padding(2)
     }
 }
