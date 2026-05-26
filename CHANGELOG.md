@@ -6,6 +6,17 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-05-26
+
+### Added
+- Menubar status dot showing model state at a glance (green when a model is loaded, white when idle), alongside the VRAM total.
+- Popover status bar with two labeled dots: Ollama daemon up/down and model loaded/none.
+- Start Ollama from the popover when the daemon is down, with a link to ollama.com when the app isn't installed.
+- Inline expanding confirmation for Stop All, matching the per-model stop confirm.
+
+### Changed
+- Stop-a-model and Quit OllamaDock confirmations now expand inline (inside the card and below the footer) instead of using an inline strip or quitting immediately.
+
 ## [0.1.0] - 2026-05-25
 
 Initial release.
@@ -18,5 +29,6 @@ Initial release.
 - Manual refresh plus auto-refresh every 10 seconds with a 1-second countdown tick.
 - No Dock icon (`LSUIElement`).
 
-[Unreleased]: https://github.com/donkasun/ollamadock/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/donkasun/ollamadock/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/donkasun/ollamadock/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/donkasun/ollamadock/releases/tag/v0.1.0
