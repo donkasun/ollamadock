@@ -2,17 +2,28 @@ import SwiftUI
 
 struct PopoverView: View {
     @Bindable var monitor: ModelMonitor
+    @State private var showQuitConfirm = false
+    @State private var showStopAllConfirm = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             header
+            statusBar
             content
-            if let error = monitor.lastUnloadError ?? monitor.lastLoadError {
+            if let error = monitor.lastUnloadError
+                            ?? monitor.lastLoadError
+                            ?? monitor.lastDaemonError {
                 Text(error)
                     .font(.caption)
                     .foregroundStyle(.red)
             }
             footer
+            if showStopAllConfirm {
+                stopAllConfirmation
+            }
+            if showQuitConfirm {
+                quitConfirmation
+            }
         }
         .padding(12)
         .frame(width: 340)
@@ -21,6 +32,47 @@ struct PopoverView: View {
             monitor.clearActionErrors()
         }
         .onDisappear { monitor.stopTicking() }
+    }
+
+    private var stopAllConfirmation: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Divider()
+            HStack {
+                Text("Stop all running models?")
+                    .font(.subheadline.weight(.semibold))
+                Spacer()
+                Button("Cancel") {
+                    withAnimation(.easeInOut(duration: 0.15)) { showStopAllConfirm = false }
+                }
+                .buttonStyle(.bordered)
+                Button("Stop All", role: .destructive) {
+                    withAnimation(.easeInOut(duration: 0.15)) { showStopAllConfirm = false }
+                    Task { await monitor.unloadAll() }
+                }
+                .buttonStyle(.borderedProminent)
+            }
+        }
+        .transition(.move(edge: .top).combined(with: .opacity))
+    }
+
+    private var quitConfirmation: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Divider()
+            HStack {
+                Text("Quit OllamaDock?")
+                    .font(.subheadline.weight(.semibold))
+                Spacer()
+                Button("Cancel") {
+                    withAnimation(.easeInOut(duration: 0.15)) { showQuitConfirm = false }
+                }
+                .buttonStyle(.bordered)
+                Button("Quit") {
+                    NSApplication.shared.terminate(nil)
+                }
+                .buttonStyle(.borderedProminent)
+            }
+        }
+        .transition(.move(edge: .top).combined(with: .opacity))
     }
 
     private var header: some View {
@@ -34,6 +86,20 @@ struct PopoverView: View {
         }
     }
 
+    private var statusBar: some View {
+        HStack(spacing: 16) {
+            StatusIndicator(
+                active: monitor.daemonUp,
+                label: monitor.daemonUp ? "Ollama running" : "Ollama stopped"
+            )
+            StatusIndicator(
+                active: monitor.modelRunning,
+                label: monitor.modelRunning ? "Model loaded" : "No model loaded"
+            )
+            Spacer()
+        }
+    }
+
     @ViewBuilder
     private var content: some View {
         switch monitor.state {
@@ -42,14 +108,27 @@ struct PopoverView: View {
                 .frame(maxWidth: .infinity, minHeight: 80)
 
         case .unreachable:
-            VStack(spacing: 6) {
+            VStack(spacing: 8) {
                 Image(systemName: "exclamationmark.triangle")
                     .font(.title2)
-                Text("Ollama isn't running")
-                    .font(.subheadline)
-                Text("Start Ollama, then press Refresh.")
+                if monitor.daemonNotInstalled {
+                    Text("Ollama isn't installed")
+                        .font(.subheadline)
+                    Link(
+                        "Get Ollama at ollama.com",
+                        destination: URL(string: "https://ollama.com")!
+                    )
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                } else {
+                    Text("Ollama isn't running")
+                        .font(.subheadline)
+                    Button("Start Ollama") {
+                        Task { await monitor.startDaemon() }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.small)
+                    .disabled(monitor.isDaemonStarting)
+                }
             }
             .frame(maxWidth: .infinity, minHeight: 80)
 
@@ -118,15 +197,19 @@ struct PopoverView: View {
             .clipShape(Circle())
             .padding(.leading, -8)
             .help("Refresh")
+
             Spacer()
+
             Button("Stop All") {
-                Task { await monitor.unloadAll() }
+                withAnimation(.easeInOut(duration: 0.15)) { showStopAllConfirm = true }
             }
             .buttonStyle(.bordered)
             .disabled(monitor.models.isEmpty)
+
             Spacer()
+
             Button {
-                NSApplication.shared.terminate(nil)
+                withAnimation(.easeInOut(duration: 0.15)) { showQuitConfirm = true }
             } label: {
                 Image(systemName: "power")
             }
@@ -134,7 +217,23 @@ struct PopoverView: View {
             .controlSize(.large)
             .clipShape(Circle())
             .padding(.trailing, -8)
-            .help("Quit")
+            .help("Quit OllamaDock")
+        }
+    }
+}
+
+private struct StatusIndicator: View {
+    let active: Bool
+    let label: String
+
+    var body: some View {
+        HStack(spacing: 5) {
+            Circle()
+                .fill(active ? Color(nsColor: .systemGreen) : Color(nsColor: .systemGray))
+                .frame(width: 7, height: 7)
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
     }
 }

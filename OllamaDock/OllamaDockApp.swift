@@ -5,7 +5,10 @@ struct OllamaDockApp: App {
     @State private var monitor: ModelMonitor
 
     init() {
-        let monitor = ModelMonitor(client: OllamaClient())
+        let monitor = ModelMonitor(
+            client: OllamaClient(),
+            daemonController: DaemonController()
+        )
         monitor.start()
         _monitor = State(wrappedValue: monitor)
     }
@@ -14,7 +17,11 @@ struct OllamaDockApp: App {
         MenuBarExtra {
             PopoverView(monitor: monitor)
         } label: {
-            MenuBarLabel(totalVRAM: monitor.totalVRAM)
+            MenuBarLabel(
+                daemonUp: monitor.daemonUp,
+                modelRunning: monitor.modelRunning,
+                totalVRAM: monitor.totalVRAM
+            )
         }
         .menuBarExtraStyle(.window)
     }

@@ -8,7 +8,7 @@ This document captures the visual and interaction principles for OllamaDock. We 
 2. **Quiet by default.** The menu bar is shared real estate. We show one tiny glyph + a short string; we never animate, blink, badge, or shout for attention.
 3. **One glance, one click.** "What's loaded, how much VRAM, can I unload it, can I load another?" — answered without scrolling.
 4. **Honesty over decoration.** Loading, empty, and error states are first-class views, not implicit on an empty list.
-5. **Confirm destructive actions inline.** Stopping a model takes a click and a confirm — no modal, no toast, no out-of-context dialog.
+5. **Confirm destructive actions inline.** Stopping a model and quitting the app each take a click and a confirm that expands in place — no modal, no toast, no out-of-context dialog.
 6. **Keyboard- and accessibility-respectful.** Standard controls inherit Full Keyboard Access, VoiceOver, Reduce Motion, Increase Contrast, and Dynamic Type for free. Don't break that.
 
 ## Surfaces
@@ -16,14 +16,17 @@ This document captures the visual and interaction principles for OllamaDock. We 
 ### 1. Menu bar label
 
 ```
-􀫦  19.5 GB
+●  19.5 GB
 ```
 
-- **Icon:** SF Symbol `cpu` (template image — tints automatically with menu bar foreground color, light/dark, and during menu bar tinting).
-- **Text:** Total VRAM across all loaded models, formatted via `ByteCountFormatter` (`[.useGB, .useMB]`, `.memory`). When nothing is loaded we render the literal `0 GB` rather than `ByteCountFormatter`'s default `Zero KB` — short, consistent units, no jarring word-shift between idle and active.
-- **Layout:** `HStack(spacing: 4)`. `.monospacedDigit()` on the text so it doesn't twitch as digits change.
-- **Updates:** Reactive via `@Observable` on `ModelMonitor.totalVRAM`. No animation — the menu bar is not a place for transitions.
-- **Never:** colored backgrounds, badges, emoji, exclamation marks, "loading…" indicators in the label. If state matters, it lives inside the popover.
+- **Status dot:** a single circle reflecting model state — `systemGreen` when at least one model is loaded, `white` when none. This is the one piece of live state we surface outside the popover, so you can tell at a glance whether the GPU is busy without opening anything.
+- **Rendering workaround:** `MenuBarExtra` tints any SwiftUI content in its label as a *template image*, which strips our fill colors (every plain `Circle()`, `Text("●")`, or SF Symbol came out solid white). The dot is therefore rendered to an `NSImage` via `ImageRenderer` with `image.isTemplate = false` — a non-template image is the only thing the menu bar leaves in full color. See `MenuBarLabel.swift`.
+- **Text:** Total VRAM across all loaded models, formatted via `ByteCountFormatter` (`[.useGB, .useMB]`, `.memory`). When nothing is loaded we render the literal `0 GB` rather than `ByteCountFormatter`'s default `Zero KB` — short, consistent units, no jarring word-shift between idle and active. Shown only while the daemon is reachable.
+- **Layout:** `HStack(spacing: 4)`, dot is a 7 pt circle. `.monospacedDigit()` on the text so it doesn't twitch as digits change.
+- **Updates:** Reactive via `@Observable` on `ModelMonitor.modelRunning` and `.totalVRAM`. No animation — the menu bar is not a place for transitions.
+- **Never:** colored backgrounds, badges, emoji, exclamation marks, blinking, "loading…" indicators in the label. The single green/white dot is the only color we allow here; richer state (daemon up/down, per-model detail) lives inside the popover.
+
+> **Why a dot and not the `cpu` glyph (v1).** The earlier label used the SF Symbol `cpu`. It looked native but carried no state — idle and busy were indistinguishable at a glance. A two-state color dot answers "is a model loaded right now?" without opening the popover, which is the single most common question. We deliberately kept it to *one* dot in the menu bar (model state only); the daemon dot lives in the popover to avoid turning shared menu-bar real estate into a status board.
 
 ### 2. Popover
 
@@ -37,7 +40,9 @@ This document captures the visual and interaction principles for OllamaDock. We 
 
 ```
 ┌──────────────────────────────────────────┐
-│  header                                  │   "Ollama"  ·  "N loaded · X GB"
+│  header                                  │   "OllamaDock"  ·  "N running · X GB"
+├──────────────────────────────────────────┤
+│  ● Ollama running   ● Model loaded       │   status bar (two labeled dots)
 ├──────────────────────────────────────────┤
 │  RUNNING ─────────────────────           │   section header (only if non-empty)
 │  ┌────────────────────────────┐          │
@@ -53,6 +58,8 @@ This document captures the visual and interaction principles for OllamaDock. We 
 │  lastUnloadError (only if non-nil)       │   red caption
 ├──────────────────────────────────────────┤
 │  ↻      Stop All                  ⏻      │   footer
+├──────────────────────────────────────────┤
+│  Quit OllamaDock?       Cancel   Quit    │   quit confirmation (expands, only when armed)
 └──────────────────────────────────────────┘
 ```
 
@@ -60,9 +67,23 @@ States that replace the two sections entirely: **loading**, **unreachable**, **f
 
 ### 3. Header
 
-- Left: `Text("Ollama")` in `.headline` — anchors the popover and identifies which daemon you're looking at, in case OllamaDock evolves to support multiple endpoints.
-- Right: `Text("N loaded · X GB")` in `.caption` + `.foregroundStyle(.secondary)`. Secondary color resolves to `NSColor.secondaryLabelColor`, which adapts to light/dark/accessibility contrast modes automatically.
+- Left: `Text("OllamaDock")` in `.headline` — anchors the popover and names the app.
+- Right: `Text("N running · X GB")` in `.caption` + `.foregroundStyle(.secondary)`. Secondary color resolves to `NSColor.secondaryLabelColor`, which adapts to light/dark/accessibility contrast modes automatically.
 - The middle-dot separator `·` (U+00B7) is the macOS convention for compound metadata (think Finder's "12 items · 4.2 GB").
+
+### 3a. Status bar
+
+A single row directly under the header, mirroring the menu bar dot but spelled out with labels:
+
+```
+● Ollama running        ● Model loaded
+```
+
+- Two `StatusIndicator`s in an `HStack(spacing: 16)`: a 7 pt `Circle` followed by a `.caption` + `.secondary` label.
+- **Daemon dot:** green when `monitor.daemonUp`, else grey — label reads `"Ollama running"` / `"Ollama stopped"`.
+- **Model dot:** green when `monitor.modelRunning`, else grey — label reads `"Model loaded"` / `"No model loaded"`.
+- **Why grey here, white in the menu bar:** the popover uses the system blur material (light *or* dark), so the inactive dot uses `systemGray` for legibility on either background. The menu bar's inactive dot is `white` because it always sits on the (effectively dark) menu bar. Active is `systemGreen` in both places.
+- This is the popover's full status board — the daemon dot in particular only appears here, keeping the menu bar to a single model dot (see §1).
 
 ### 4. Section headers — "RUNNING" / "AVAILABLE"
 
@@ -90,18 +111,21 @@ The rule for a loaded model is: **you already know its size from the header; you
 - **Countdown:** `.caption` + `.monospacedDigit()` + `.white.opacity(0.75)`. Format: `4m 12s`, `42s`, or `unloading…` once the deadline passes. Monospaced digits prevent horizontal jitter as the timer ticks.
 - **Stop button:** `Image(systemName: "stop.fill")`, `.buttonStyle(.borderless)`, `.help("Stop \(model.name)")`. `stop.fill` is the Activity Monitor / QuickTime convention for halting a running process — clearer than `eject` for "kill this model right now."
 
-**Inline destructive confirmation.** Tapping ◼ flips the right side into a two-button confirm strip (`@State var confirming`):
+**Inline destructive confirmation (expands downward).** Tapping ◼ keeps the row intact and expands a confirmation section *inside the same card*, pushing the card taller (`@State var confirming`):
 
 ```
 ┌──────────────────────────────────────────┐
-│  llama3:8b              Stop?  Cancel    │
+│  llama3:8b              4m 12s     ◼     │
+│  ────────────────────────────────────    │   hairline divider (white @ 25%)
+│  Stop this model?         Cancel   Stop  │
 └──────────────────────────────────────────┘
 ```
 
-- "Stop?" in `.foregroundStyle(.red)` — the affirmative is the destructive choice, so it gets the warning color. Tap commits the unload and resets state.
-- "Cancel" returns the row to its resting form.
-- Both buttons are `.borderless` `.caption` so the row height doesn't jump.
-- This is the [Finder-empty-trash](https://developer.apple.com/design/human-interface-guidelines/alerts) pattern but inline: no modal, no toast, no out-of-context dialog. Reversibility is one click away until you press the red button.
+- The card is a `VStack(spacing: 0)`: the resting row on top, the confirmation below. When armed, a `Divider().overlay(Color.white.opacity(0.25))` separates them and a `"Stop this model?"` prompt + Cancel / Stop buttons slide in.
+- All confirmation text uses `.white` / `.white.opacity(0.75)` to stay legible on the accent card (matching the rest of the row — see §5 text-color rule), not red. The card's solid accent fill already signals "this is the running model you're acting on."
+- "Stop" commits the unload; "Cancel" collapses the section. Both are `.borderless` `.caption`.
+- Animated with `withAnimation(.easeInOut(duration: 0.15))` + `.transition(.move(edge: .top).combined(with: .opacity))` so the section grows downward rather than popping.
+- This is the [Finder-empty-trash](https://developer.apple.com/design/human-interface-guidelines/alerts) pattern but inline and self-contained: no modal, no toast, no out-of-context dialog. The confirmation stays attached to the card it acts on. Reversibility is one click away until you press Stop.
 
 **Why no VRAM bar per row.** The earlier draft showed a linear `ProgressView` of `sizeVRAM / totalRAM` under each row. We pulled it because:
 - The header already shows aggregate VRAM in use.
@@ -129,13 +153,17 @@ Models that are pulled but not currently loaded. Two lines because the size on d
 
 When neither section has rows, the content area collapses to a centered ~80 pt vignette. They share the same shape: optional SF Symbol on top, primary text below in `.subheadline`, secondary hint in `.caption` + `.secondary`.
 
-| State | Icon | Primary | Secondary |
+| State | Icon | Primary | Secondary / action |
 |---|---|---|---|
 | Loading | (system `ProgressView`) | "Checking…" | — |
-| Unreachable | `exclamationmark.triangle` (`.title2`) | "Ollama isn't running" | "Start Ollama, then press Refresh." |
+| Unreachable, app installed | `exclamationmark.triangle` (`.title2`) | "Ollama isn't running" | **Start Ollama** button (`.borderedProminent`, `.small`) |
+| Unreachable, app missing | `exclamationmark.triangle` (`.title2`) | "Ollama isn't installed" | `Link("Get Ollama at ollama.com")` |
+| Protocol error | `exclamationmark.triangle` (`.title2`) | "Ollama responded unexpectedly" | the underlying message in `.caption` + `.secondary` |
 | Connected, fully empty | — | "No models loaded" | "Run a model to see it here." |
 
 The "fully empty" branch fires only when `monitor.models.isEmpty && monitor.availableModels.isEmpty`. If you have library models pulled but none loaded, you see the Available section, not the empty state — because there's something useful you can do (press ▶ to load one).
+
+**Start Ollama vs. install guide.** When the daemon is unreachable we offer to launch it (`monitor.startDaemon()` → `open -a Ollama`). The button is disabled while `monitor.isDaemonStarting`. If `open` reports the app isn't installed (`DaemonControlError.appNotFound`), the monitor flips `daemonNotInstalled` and we swap the button for a link to ollama.com instead of letting the user mash a button that can't succeed. Quitting the daemon is intentionally **not** offered — it proved unreliable to control from outside the app, so we don't expose an action that can't be trusted.
 
 **Why no custom illustrations:** macOS empty states (Finder, Mail, Notes) use text or single SF Symbols, never illustrations. We follow suit.
 
@@ -159,10 +187,22 @@ Text(error)
 
 - **All three buttons** use `.buttonStyle(.bordered)` — the modern macOS pill-shaped buttons, same as Settings panes and macOS 14 alerts.
 - **Refresh (↻):** icon-only `arrow.clockwise` with `.help("Refresh")`. Always enabled — pressing it while unreachable forces an immediate retry. Refresh triggers both `monitor.refresh()` (loaded models) and `monitor.refreshLibrary()` (available models) so one tap synchronises the whole popover.
-- **Stop All:** text label, not icon. Destructive batch action deserves an explicit verb. `.disabled(monitor.models.isEmpty)` so it greys out when there's nothing loaded.
-- **Quit (⏻):** icon-only `power` symbol, right-aligned via `Spacer()`, with `.help("Quit")`. Calls `NSApplication.shared.terminate(nil)`.
+- **Stop All:** text label, not icon. Destructive batch action deserves an explicit verb. `.disabled(monitor.models.isEmpty)` so it greys out when there's nothing loaded. Arms an inline expanding confirmation ("Stop all running models?") below the footer — same pattern and motion as the Quit confirm — rather than unloading on the first tap.
+- **Quit (⏻):** icon-only `power` symbol, right-aligned via `Spacer()`, with `.help("Quit OllamaDock")`. Does **not** quit immediately — it arms a confirmation that expands below the footer (see below).
 
 **Why icons for Refresh and Quit, text for Stop All.** Refresh and Quit are universal — every menu-bar utility has them, and the symbols are unambiguous. Stop All is destructive and project-specific; spelling it out reduces the risk of an accidental tap.
+
+**Quit confirmation (expands downward).** Pressing ⏻ sets `@State showQuitConfirm`, which slides a section in below the footer rather than terminating on the first click:
+
+```
+├──────────────────────────────────────────┤
+│  Quit OllamaDock?         Cancel   Quit   │
+└──────────────────────────────────────────┘
+```
+
+- A `Divider()` then `"Quit OllamaDock?"` (`.subheadline.weight(.semibold)`) with **Cancel** (`.bordered`) and **Quit** (`.borderedProminent`). Quit calls `NSApplication.shared.terminate(nil)`; Cancel collapses the section.
+- Same motion as the model-stop confirm — `withAnimation(.easeInOut(duration: 0.15))` + `.transition(.move(edge: .top).combined(with: .opacity))`.
+- This keeps the app's only truly irreversible action (it dismisses the popover and exits) behind the same inline, in-context confirm pattern used for stopping a model — no separate dialog, consistent with §5.
 
 ## Typography
 
@@ -175,7 +215,9 @@ System fonts only.
 | Body text in state vignettes | `.subheadline` |
 | Section dividers ("LOADED" / "AVAILABLE") | `.caption` + `.secondary` + `.textCase(.uppercase)` |
 | Metadata (count, size on disk, countdown, hints) | `.caption` + `.foregroundStyle(.secondary)` |
-| Destructive confirm ("Stop?") | `.caption` + `.foregroundStyle(.red)` |
+| Status bar labels | `.caption` + `.foregroundStyle(.secondary)` |
+| Stop-confirm prompt/buttons (on accent card) | `.caption` + `.white` / `.white.opacity(0.75)` |
+| Quit-confirm prompt | `.subheadline.weight(.semibold)` |
 | Errors | `.caption` + `.foregroundStyle(.red)` |
 | Anything with numbers that tick | `.monospacedDigit()` |
 
@@ -187,8 +229,11 @@ We use **only** semantic SwiftUI/AppKit colors:
 
 - `Color.secondary` — text, hairline rules (`0.35` opacity), available model card backgrounds (`0.08` opacity)
 - `Color.accentColor` — running model card background (full opacity); resolves to the user's chosen system accent colour
-- `.white` / `.white.opacity(0.75)` — text inside running model cards (over the solid accent background)
-- `.red` (destructive confirm, errors) → `NSColor.systemRed`
+- `.white` / `.white.opacity(0.75)` — text inside running model cards (over the solid accent background); stop-confirm divider at `0.25`
+- `NSColor.systemGreen` — active status dot (model loaded / daemon up), both menu bar and popover
+- `NSColor.systemGray` — inactive status dot in the popover (legible on the blur material)
+- `.white` — inactive status dot in the menu bar (always on the dark menu bar)
+- `.red` (errors) → `NSColor.systemRed`
 
 No hardcoded hex values. No custom asset catalog colors. The popover itself uses `MenuBarExtra(.window)`'s system material, which handles light/dark/vibrancy/wallpaper-tinting automatically.
 
@@ -201,7 +246,8 @@ No hardcoded hex values. No custom asset catalog colors. The popover itself uses
 - **Card corner radius:** 8 pt
 - **Section header spacing:** 6 pt
 - **HStack spacing in menu bar label:** 4 pt
-- **Confirm strip spacing:** 6 pt
+- **Inline confirmation spacing:** 8 pt (divider → prompt → buttons)
+- **Status bar dot↔label spacing:** 5 pt; indicator↔indicator: 16 pt
 
 These map to the macOS 12 / 8 / 4 grid family. Stay on the grid unless there's a specific layout reason to deviate.
 
@@ -209,7 +255,7 @@ These map to the macOS 12 / 8 / 4 grid family. Stay on the grid unless there's a
 
 | Symbol | Used for | Why |
 |---|---|---|
-| `cpu` | Menu bar glyph | Matches the "what's using my compute" frame |
+| (rendered dot) | Menu bar + status bar | Two-state model/daemon indicator — not an SF Symbol; a `Circle` rendered to a non-template `NSImage` so it keeps color (see §1) |
 | `stop.fill` | Stop a loaded model | Activity Monitor / QuickTime convention for halting |
 | `play.fill` | Load an available model | Symmetric affirmative of stop |
 | `arrow.clockwise` | Refresh | Universal refresh glyph |
@@ -220,16 +266,17 @@ All `Image(systemName: …)` — no custom assets ship in the bundle.
 
 ## Motion
 
-There is no custom animation in v1. SwiftUI's implicit transitions on `@Observable` updates are sufficient — and respecting Reduce Motion is free when we don't add explicit animations.
+Animation is limited to the two inline confirmations, which expand/collapse with `withAnimation(.easeInOut(duration: 0.15))` paired with `.transition(.move(edge: .top).combined(with: .opacity))`:
 
-Two places where animation could land later:
-- The Stop confirm strip could fade/slide in (`.transition(.opacity)`).
-- A loaded model appearing in the list could fade in.
+- **Model stop confirm** — grows downward inside the running-model card (§5).
+- **Quit OllamaDock confirm** — grows downward below the footer (§9).
 
-Rules for any future animation:
-- Use `.smooth` or `.easeInOut(duration: 0.2)` — not springs.
-- Respect `@Environment(\.accessibilityReduceMotion)`.
-- Never animate the menu bar label.
+Everything else relies on SwiftUI's implicit transitions on `@Observable` updates.
+
+Rules for animation:
+- Use `.easeInOut` (short, ≤0.2 s) — not springs.
+- Respect `@Environment(\.accessibilityReduceMotion)` (ease-in-out at this duration degrades gracefully under Reduce Motion).
+- **Never animate the menu bar label.** The status dot and VRAM text switch instantly — no fades, no blinking.
 
 ## Accessibility
 

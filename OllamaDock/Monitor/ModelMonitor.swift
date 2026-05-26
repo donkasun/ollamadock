@@ -10,8 +10,22 @@ final class ModelMonitor {
     private(set) var now: Date = Date()
     private(set) var lastUnloadError: String?
     private(set) var lastLoadError: String?
+    private(set) var lastDaemonError: String?
+    private(set) var daemonNotInstalled: Bool = false
+    private(set) var isDaemonStarting: Bool = false
     private(set) var library: [LibraryModel] = []
     private(set) var loadingModels: Set<String> = []
+
+    /// True when the daemon is reachable (connected or answered with a protocol error).
+    var daemonUp: Bool {
+        switch state {
+        case .connected, .protocolError: return true
+        case .unreachable, .loading: return false
+        }
+    }
+
+    /// True when at least one model is loaded in VRAM.
+    var modelRunning: Bool { !models.isEmpty }
 
     var availableModels: [LibraryModel] {
         let loadedNames = Set(models.map(\.name))
@@ -19,6 +33,7 @@ final class ModelMonitor {
     }
 
     private let client: OllamaClienting
+    private let daemonController: DaemonControlling
     private let pollInterval: TimeInterval
     private let tickInterval: TimeInterval
     private var pollTask: Task<Void, Never>?
@@ -26,10 +41,12 @@ final class ModelMonitor {
 
     init(
         client: OllamaClienting,
+        daemonController: DaemonControlling = DaemonController(),
         pollInterval: TimeInterval = 10,
         tickInterval: TimeInterval = 1
     ) {
         self.client = client
+        self.daemonController = daemonController
         self.pollInterval = pollInterval
         self.tickInterval = tickInterval
     }
@@ -103,6 +120,26 @@ final class ModelMonitor {
     func clearActionErrors() {
         lastUnloadError = nil
         lastLoadError = nil
+        lastDaemonError = nil
+        daemonNotInstalled = false
+    }
+
+    func startDaemon() async {
+        guard !isDaemonStarting else { return }
+        isDaemonStarting = true
+        defer { isDaemonStarting = false }
+        do {
+            try await daemonController.start()
+            daemonNotInstalled = false
+            lastDaemonError = nil
+        } catch DaemonControlError.appNotFound {
+            daemonNotInstalled = true
+            lastDaemonError = nil
+        } catch {
+            daemonNotInstalled = false
+            lastDaemonError = "Failed to start Ollama: \(error.localizedDescription)"
+        }
+        await refresh()
     }
 
     func load(_ modelName: String) async {
