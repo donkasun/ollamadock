@@ -3,6 +3,7 @@ import SwiftUI
 struct PopoverView: View {
     @Bindable var monitor: ModelMonitor
     @State private var showQuitConfirm = false
+    @State private var showStopAllConfirm = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -17,6 +18,9 @@ struct PopoverView: View {
                     .foregroundStyle(.red)
             }
             footer
+            if showStopAllConfirm {
+                stopAllConfirmation
+            }
             if showQuitConfirm {
                 quitConfirmation
             }
@@ -28,6 +32,27 @@ struct PopoverView: View {
             monitor.clearActionErrors()
         }
         .onDisappear { monitor.stopTicking() }
+    }
+
+    private var stopAllConfirmation: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Divider()
+            HStack {
+                Text("Stop all running models?")
+                    .font(.subheadline.weight(.semibold))
+                Spacer()
+                Button("Cancel") {
+                    withAnimation(.easeInOut(duration: 0.15)) { showStopAllConfirm = false }
+                }
+                .buttonStyle(.bordered)
+                Button("Stop All", role: .destructive) {
+                    withAnimation(.easeInOut(duration: 0.15)) { showStopAllConfirm = false }
+                    Task { await monitor.unloadAll() }
+                }
+                .buttonStyle(.borderedProminent)
+            }
+        }
+        .transition(.move(edge: .top).combined(with: .opacity))
     }
 
     private var quitConfirmation: some View {
@@ -176,7 +201,7 @@ struct PopoverView: View {
             Spacer()
 
             Button("Stop All") {
-                Task { await monitor.unloadAll() }
+                withAnimation(.easeInOut(duration: 0.15)) { showStopAllConfirm = true }
             }
             .buttonStyle(.bordered)
             .disabled(monitor.models.isEmpty)

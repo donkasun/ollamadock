@@ -187,7 +187,7 @@ Text(error)
 
 - **All three buttons** use `.buttonStyle(.bordered)` — the modern macOS pill-shaped buttons, same as Settings panes and macOS 14 alerts.
 - **Refresh (↻):** icon-only `arrow.clockwise` with `.help("Refresh")`. Always enabled — pressing it while unreachable forces an immediate retry. Refresh triggers both `monitor.refresh()` (loaded models) and `monitor.refreshLibrary()` (available models) so one tap synchronises the whole popover.
-- **Stop All:** text label, not icon. Destructive batch action deserves an explicit verb. `.disabled(monitor.models.isEmpty)` so it greys out when there's nothing loaded.
+- **Stop All:** text label, not icon. Destructive batch action deserves an explicit verb. `.disabled(monitor.models.isEmpty)` so it greys out when there's nothing loaded. Arms an inline expanding confirmation ("Stop all running models?") below the footer — same pattern and motion as the Quit confirm — rather than unloading on the first tap.
 - **Quit (⏻):** icon-only `power` symbol, right-aligned via `Spacer()`, with `.help("Quit OllamaDock")`. Does **not** quit immediately — it arms a confirmation that expands below the footer (see below).
 
 **Why icons for Refresh and Quit, text for Stop All.** Refresh and Quit are universal — every menu-bar utility has them, and the symbols are unambiguous. Stop All is destructive and project-specific; spelling it out reduces the risk of an accidental tap.
